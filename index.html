@@ -1,0 +1,1216 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Gelir & Gider Yönetimi (Firebase)</title>
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <!-- SheetJS -->
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js">
+    </script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js">
+    </script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js">
+    </script>
+    <style>
+        body {
+            background: #f4f7fc;
+            padding: 2rem 0;
+            font-family: 'Segoe UI', Roboto, sans-serif;
+        }
+        .card {
+            border-radius: 24px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
+            border: none;
+            background: white;
+        }
+        .card-header {
+            background: white;
+            border-bottom: 1px solid #eef2f6;
+            padding: 1.5rem 1.5rem 0.5rem 1.5rem;
+            font-weight: 600;
+            font-size: 1.2rem;
+            border-radius: 24px 24px 0 0 !important;
+        }
+        .nav-pills .nav-link {
+            border-radius: 40px;
+            color: #475569;
+            font-weight: 500;
+            padding: 0.5rem 1.2rem;
+        }
+        .nav-pills .nav-link.active {
+            background: #3b82f6;
+            color: white;
+        }
+        .nav-pills .nav-link i {
+            margin-right: 6px;
+        }
+        .form-label {
+            font-weight: 500;
+            color: #1e293b;
+            font-size: 0.9rem;
+        }
+        .form-control,
+        .form-select {
+            border-radius: 14px;
+            border: 1px solid #dce2ec;
+            padding: 0.6rem 1rem;
+            background: white;
+            font-size: 0.95rem;
+        }
+        .form-control:focus,
+        .form-select:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+        }
+        .btn {
+            border-radius: 40px;
+            padding: 0.5rem 1.8rem;
+            font-weight: 500;
+        }
+        .btn-primary {
+            background: #3b82f6;
+            border: none;
+        }
+        .btn-primary:hover {
+            background: #2563eb;
+        }
+        .btn-success {
+            background: #10b981;
+            border: none;
+        }
+        .btn-success:hover {
+            background: #059669;
+        }
+        .btn-outline-secondary {
+            border: 1px solid #dce2ec;
+            color: #475569;
+        }
+        .btn-outline-secondary:hover {
+            background: #f1f5f9;
+            border-color: #b9c7da;
+        }
+        .btn-danger {
+            background: #ef4444;
+            border: none;
+        }
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+        .search-box {
+            position: relative;
+        }
+        .search-box i {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+        }
+        .search-box input {
+            padding-left: 42px;
+            border-radius: 40px;
+            border: 1px solid #e2e8f0;
+            background: #f8fafc;
+            height: 44px;
+        }
+        .search-box input:focus {
+            background: white;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        .table-responsive {
+            border-radius: 16px;
+            border: 1px solid #edf2f7;
+        }
+        #previewTable th {
+            background: #f8fafc;
+            font-weight: 600;
+            color: #1e293b;
+            border-bottom: 1px solid #e2e8f0;
+            white-space: nowrap;
+        }
+        #previewTable td {
+            vertical-align: middle;
+        }
+        .product-badge {
+            background: #eef2ff;
+            color: #4338ca;
+            padding: 0.25rem 0.75rem;
+            border-radius: 30px;
+            font-size: 0.8rem;
+            display: inline-block;
+        }
+        .type-badge {
+            font-weight: 500;
+            padding: 0.25rem 0.9rem;
+            border-radius: 30px;
+            font-size: 0.75rem;
+        }
+        .type-badge.havale {
+            background: #dbeafe;
+            color: #1e4f8a;
+        }
+        .type-badge.nakit {
+            background: #e2e8f0;
+            color: #334155;
+        }
+        .row-count-badge {
+            background: #f1f5f9;
+            padding: 0.2rem 1rem;
+            border-radius: 30px;
+            font-size: 0.85rem;
+            color: #475569;
+        }
+        footer {
+            color: #94a3b8;
+            font-size: 0.8rem;
+        }
+        .tab-pane {
+            padding-top: 1.2rem;
+        }
+        .form-text {
+            font-size: 0.8rem;
+            color: #94a3b8;
+        }
+        .havale-note-area {
+            background: #fafcff;
+            border-radius: 14px;
+            padding: 0.4rem 0.8rem;
+            border: 1px solid #e2e8f0;
+        }
+        .section-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 0.25rem;
+        }
+        .recipient-tag {
+            background: #e6f0ff;
+            border-radius: 30px;
+            padding: 0.15rem 0.8rem;
+            font-size: 0.8rem;
+            display: inline-block;
+            cursor: pointer;
+            transition: 0.15s;
+            border: 1px solid transparent;
+            margin: 0.1rem;
+        }
+        .recipient-tag:hover {
+            background: #c7d9f7;
+            border-color: #3b82f6;
+        }
+        .expense-quick-tag {
+            background: #fee2e2;
+            border-radius: 30px;
+            padding: 0.15rem 0.8rem;
+            font-size: 0.8rem;
+            display: inline-block;
+            cursor: pointer;
+            transition: 0.15s;
+            border: 1px solid transparent;
+            margin: 0.1rem;
+        }
+        .expense-quick-tag:hover {
+            background: #fecaca;
+            border-color: #ef4444;
+        }
+        .management-tag {
+            background: #f1f5f9;
+            border-radius: 30px;
+            padding: 0.3rem 0.8rem;
+            font-size: 0.8rem;
+            display: inline-block;
+            border: 1px solid #e2e8f0;
+            margin: 0.1rem;
+        }
+        .management-tag .remove-tag {
+            cursor: pointer;
+            color: #ef4444;
+            margin-left: 6px;
+            font-weight: bold;
+        }
+        .management-tag .remove-tag:hover {
+            color: #dc2626;
+        }
+        .bank-info {
+            font-size: 0.7rem;
+            color: #3b82f6;
+            background: #dbeafe;
+            padding: 0.1rem 0.5rem;
+            border-radius: 20px;
+            display: inline-block;
+        }
+        .sync-status {
+            font-size: 0.8rem;
+            padding: 0.2rem 1rem;
+            border-radius: 30px;
+            background: #d1e7dd;
+            color: #0f5132;
+        }
+        .sync-status.syncing {
+            background: #fff3cd;
+            color: #856404;
+        }
+        .sync-status.error {
+            background: #f8d7da;
+            color: #842029;
+        }
+        .firebase-badge {
+            background: #ffca28;
+            color: #202124;
+            padding: 0.2rem 0.8rem;
+            border-radius: 30px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container" style="max-width: 1300px;">
+
+        <div class="card">
+            <div class="card-header d-flex flex-wrap justify-content-between align-items-center">
+                <span>
+                    <i class="fas fa-chart-pie me-2 text-primary"></i>
+                    Gelir & Gider Yönetimi
+                    <span class="firebase-badge ms-2"><i class="fas fa-cloud me-1"></i>Firebase</span>
+                </span>
+                <span class="badge bg-light text-secondary" id="syncStatus">
+                    <i class="fas fa-sync me-1"></i> Senkronize
+                </span>
+            </div>
+            <div class="card-body p-4">
+
+                <!-- Sekmeler -->
+                <ul class="nav nav-pills mb-3" id="myTab" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="sales-tab" data-bs-toggle="tab" data-bs-target="#sales" type="button" role="tab">
+                            <i class="fas fa-arrow-up text-success"></i> Gelir
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="expense-tab" data-bs-toggle="tab" data-bs-target="#expense" type="button" role="tab">
+                            <i class="fas fa-arrow-down text-danger"></i> Gider
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="management-tab" data-bs-toggle="tab" data-bs-target="#management" type="button" role="tab">
+                            <i class="fas fa-cog text-secondary"></i> Yönetim
+                        </button>
+                    </li>
+                </ul>
+
+                <div class="tab-content" id="myTabContent">
+
+                    <!-- GELİR SEKMESİ -->
+                    <div class="tab-pane fade show active" id="sales" role="tabpanel">
+                        <div class="row g-4">
+                            <div class="col-lg-5">
+                                <div class="bg-light p-3 rounded-4" style="background:#fafcff!important;">
+                                    <h6 class="section-title"><i class="fas fa-pen-alt me-1 text-primary"></i> Yeni Gelir</h6>
+                                    <form id="salesForm" novalidate>
+                                        <div class="row g-3">
+                                            <div class="col-md-12">
+                                                <label class="form-label">👤 Müşteri (Size ödeme yapan)</label>
+                                                <input type="text" class="form-control" id="salesCustomer" placeholder="Müşteri adı" />
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label">📦 Ürün</label>
+                                                <input type="text" class="form-control" id="salesProduct" placeholder="Ürün adı" />
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label">🏷️ Ödeme</label>
+                                                <select class="form-select" id="salesPayment">
+                                                    <option value="Nakit">Nakit</option>
+                                                    <option value="Havale" selected>Havale</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label">📅 Tarih</label>
+                                                <input type="date" class="form-control" id="salesDate" />
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label">💰 Tutar (₺)</label>
+                                                <div class="input-group">
+                                                    <span class="input-group-text bg-white border-end-0">₺</span>
+                                                    <input type="number" class="form-control border-start-0" id="salesAmount" placeholder="0.00" step="0.01" />
+                                                </div>
+                                            </div>
+                                            <div class="col-12" id="salesHavaleContainer">
+                                                <label class="form-label">🏦 Havale Alan Kişi (Parayı göndereceğiniz kişi)</label>
+                                                <div class="d-flex flex-wrap gap-1 mb-2" id="recipientTagsContainer">
+                                                    <!-- Dinamik -->
+                                                </div>
+                                                <div class="havale-note-area d-flex align-items-center gap-2">
+                                                    <i class="fas fa-university text-secondary"></i>
+                                                    <input type="text" class="form-control border-0 ps-1" id="salesHavaleNote" placeholder="Havale alacak kişi bilgisi" />
+                                                </div>
+                                                <div class="form-text">Yukarıdaki listeden bir kişi seçin veya manuel girin.</div>
+                                            </div>
+                                            <div class="col-12 d-flex gap-2 mt-2">
+                                                <button type="button" class="btn btn-primary" id="addSalesBtn"><i class="fas fa-plus me-1"></i> Ekle</button>
+                                                <button type="button" class="btn btn-outline-secondary" id="clearSalesBtn"><i class="fas fa-trash-alt"></i></button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-7">
+                                <div class="d-flex flex-wrap justify-content-between align-items-center mb-2 gap-2">
+                                    <h6 class="mb-0 fw-semibold"><i class="fas fa-table me-1 text-secondary"></i> Gelir Listesi</h6>
+                                    <div class="search-box" style="flex:1; max-width:260px;">
+                                        <i class="fas fa-search"></i>
+                                        <input type="text" class="form-control" id="salesSearch" placeholder="Ara..." />
+                                    </div>
+                                    <span class="row-count-badge" id="salesRowCount">0 satır</span>
+                                </div>
+                                <div class="table-responsive">
+                                    <table class="table table-hover align-middle mb-0" id="salesTable">
+                                        <thead>
+                                            <tr>
+                                                <th>#</th><th>Müşteri</th><th>Ürün</th><th>Ödeme</th><th>Havale Alan</th><th>Tutar</th><th>Tarih</th><th></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="salesBody">
+                                            <!-- Firebase'den yüklenecek -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- GİDER SEKMESİ -->
+                    <div class="tab-pane fade" id="expense" role="tabpanel">
+                        <div class="row g-4">
+                            <div class="col-lg-5">
+                                <div class="bg-light p-3 rounded-4" style="background:#fafcff!important;">
+                                    <h6 class="section-title"><i class="fas fa-wallet me-1 text-danger"></i> Yeni Gider</h6>
+                                    <form id="expenseForm" novalidate>
+                                        <div class="row g-3">
+                                            <div class="col-md-12">
+                                                <label class="form-label">📂 Hazır Gider Kalemleri</label>
+                                                <div class="d-flex flex-wrap gap-1 mb-2" id="expenseTagsContainer">
+                                                    <!-- Dinamik -->
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label">📂 Kategori</label>
+                                                <select class="form-select" id="expenseCategory">
+                                                    <option value="Yemek/İçecek">Yemek/İçecek</option>
+                                                    <option value="Kira">Kira</option>
+                                                    <option value="Fatura">Fatura</option>
+                                                    <option value="Ulaşım">Ulaşım</option>
+                                                    <option value="Ofis">Ofis</option>
+                                                    <option value="Diğer">Diğer</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label">📦 Ürün / Hizmet</label>
+                                                <input type="text" class="form-control" id="expenseProduct" placeholder="Ürün adı" />
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label">👤 Alıcı / Firma</label>
+                                                <input type="text" class="form-control" id="expenseReceiver" placeholder="Alıcı adı" />
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label">📅 Tarih</label>
+                                                <input type="date" class="form-control" id="expenseDate" />
+                                            </div>
+                                            <div class="col-12">
+                                                <label class="form-label">💰 Tutar (₺)</label>
+                                                <div class="input-group">
+                                                    <span class="input-group-text bg-white border-end-0">₺</span>
+                                                    <input type="number" class="form-control border-start-0" id="expenseAmount" placeholder="0.00" step="0.01" />
+                                                </div>
+                                            </div>
+                                            <div class="col-12">
+                                                <label class="form-label">📝 Açıklama / Not</label>
+                                                <input type="text" class="form-control" id="expenseNote" placeholder="İsteğe bağlı" />
+                                            </div>
+                                            <div class="col-12 d-flex gap-2 mt-2">
+                                                <button type="button" class="btn btn-primary" id="addExpenseBtn"><i class="fas fa-plus me-1"></i> Ekle</button>
+                                                <button type="button" class="btn btn-outline-secondary" id="clearExpenseBtn"><i class="fas fa-trash-alt"></i></button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-7">
+                                <div class="d-flex flex-wrap justify-content-between align-items-center mb-2 gap-2">
+                                    <h6 class="mb-0 fw-semibold"><i class="fas fa-table me-1 text-secondary"></i> Gider Listesi</h6>
+                                    <div class="search-box" style="flex:1; max-width:260px;">
+                                        <i class="fas fa-search"></i>
+                                        <input type="text" class="form-control" id="expenseSearch" placeholder="Ara..." />
+                                    </div>
+                                    <span class="row-count-badge" id="expenseRowCount">0 satır</span>
+                                </div>
+                                <div class="table-responsive">
+                                    <table class="table table-hover align-middle mb-0" id="expenseTable">
+                                        <thead>
+                                            <tr>
+                                                <th>#</th><th>Kategori</th><th>Ürün/Hizmet</th><th>Alıcı</th><th>Tutar</th><th>Tarih</th><th>Not</th><th></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="expenseBody">
+                                            <!-- Firebase'den yüklenecek -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- YÖNETİM SEKMESİ -->
+                    <div class="tab-pane fade" id="management" role="tabpanel">
+                        <div class="row g-4">
+                            <div class="col-md-6">
+                                <div class="card h-100">
+                                    <div class="card-body">
+                                        <h6 class="section-title"><i class="fas fa-user-plus me-1 text-primary"></i> Havale Alacak Kişiler</h6>
+                                        <p class="text-muted small">Bu kişilere havale göndereceksiniz. <strong>Notlar sadece burada görünür.</strong></p>
+                                        <div class="d-flex gap-2 mb-3 flex-wrap">
+                                            <input type="text" class="form-control" id="newRecipientName" placeholder="Kişi adı" style="flex:1; min-width:120px;" />
+                                            <input type="text" class="form-control" id="newRecipientNote" placeholder="Banka / IBAN / Not" style="flex:2; min-width:150px;" />
+                                            <button class="btn btn-primary" id="addRecipientBtn"><i class="fas fa-plus"></i></button>
+                                        </div>
+                                        <div id="recipientList" class="d-flex flex-wrap gap-2">
+                                            <!-- Dinamik -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card h-100">
+                                    <div class="card-body">
+                                        <h6 class="section-title"><i class="fas fa-tag me-1 text-danger"></i> Hazır Gider Kalemleri</h6>
+                                        <p class="text-muted small">Sık kullandığınız giderleri buraya ekleyin. Gider formunda tek tıkla kullanın.</p>
+                                        <div class="d-flex gap-2 mb-3 flex-wrap">
+                                            <input type="text" class="form-control" id="newExpenseCategory" placeholder="Kategori" style="flex:1; min-width:80px;" />
+                                            <input type="text" class="form-control" id="newExpenseProduct" placeholder="Ürün adı" style="flex:1; min-width:80px;" />
+                                            <input type="number" class="form-control" id="newExpenseAmount" placeholder="Tutar" style="width:90px;" />
+                                            <input type="text" class="form-control" id="newExpenseReceiver" placeholder="Alıcı" style="flex:1; min-width:80px;" />
+                                            <input type="text" class="form-control" id="newExpenseNote" placeholder="Not" style="flex:1; min-width:80px;" />
+                                            <button class="btn btn-primary" id="addExpenseTemplateBtn"><i class="fas fa-plus"></i></button>
+                                        </div>
+                                        <div id="expenseTemplateList" class="d-flex flex-wrap gap-2">
+                                            <!-- Dinamik -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div><!-- tab-content -->
+
+                <!-- EXCEL BUTONLARI -->
+                <div class="row mt-4">
+                    <div class="col-12 d-flex justify-content-center gap-3 flex-wrap">
+                        <button class="btn btn-success btn-lg" id="exportCombinedExcel">
+                            <i class="fas fa-file-excel me-2"></i> Tablo Halinde Excel İndir
+                        </button>
+                        <button class="btn btn-info btn-lg text-white" id="exportPersonBasedExcel">
+                            <i class="fas fa-user me-2"></i> Kişi Bazlı Rapor
+                        </button>
+                    </div>
+                </div>
+
+            </div><!-- card-body -->
+            <div class="card-footer bg-white border-0 text-center pt-0 pb-3">
+                <footer><i class="fas fa-database me-1"></i> Tüm veriler Firebase Realtime Database'de saklanır. Değişiklikler anında senkronize olur.</footer>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js">
+    </script>
+
+    <script>
+        // ============================================================
+        // FIREBASE KONFIGÜRASYONU
+        // ============================================================
+        const firebaseConfig = {
+            apiKey: "AIzaSyAyDVAK9r-1YJmlDHoatdqyS49Lm7-19as",
+            authDomain: "mkrgelirgider.firebaseapp.com",
+            databaseURL: "https://mkrgelirgider-default-rtdb.firebaseio.com",
+            projectId: "mkrgelirgider",
+            storageBucket: "mkrgelirgider.firebasestorage.app",
+            messagingSenderId: "775659718508",
+            appId: "1:775659718508:web:cf9b8ae7b72c3148af9549"
+        };
+
+        // Firebase'i başlat
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        // ============================================================
+        // REFERANSLAR
+        // ============================================================
+        const salesRef = db.ref('gelirler');
+        const expenseRef = db.ref('giderler');
+        const recipientsRef = db.ref('havaleAlacakKisiler');
+        const expenseTemplatesRef = db.ref('hazirGiderKalemleri');
+
+        // ============================================================
+        // DURUM GÖSTERGESİ
+        // ============================================================
+        const syncStatus = document.getElementById('syncStatus');
+
+        function setSyncStatus(text, type = 'success') {
+            syncStatus.innerHTML = text;
+            syncStatus.className = 'badge bg-light text-secondary';
+            if (type === 'syncing') {
+                syncStatus.classList.add('syncing');
+            } else if (type === 'error') {
+                syncStatus.classList.add('error');
+            } else {
+                syncStatus.classList.add('sync-status');
+            }
+        }
+
+        // ============================================================
+        // ORTAK YARDIMCILAR
+        // ============================================================
+        function escapeHtml(unsafe) {
+            if (!unsafe) return '';
+            return unsafe.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        function formatAmount(val) {
+            if (isNaN(val) || val === '') return '0,00';
+            return parseFloat(val).toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+
+        function parseTurkishNumber(str) {
+            if (!str) return 0;
+            let cleaned = str.replace(/\./g, '').replace(',', '.');
+            return parseFloat(cleaned) || 0;
+        }
+
+        function getToday() {
+            return new Date().toISOString().split('T')[0];
+        }
+
+        function updateRowNumbers(tbody) {
+            const rows = tbody.querySelectorAll('tr');
+            rows.forEach((row, idx) => {
+                const firstTd = row.querySelector('td:first-child');
+                if (firstTd) firstTd.textContent = idx + 1;
+            });
+            return rows.length;
+        }
+
+        function filterTable(tbody, searchInput) {
+            const query = searchInput.value.toLowerCase().trim();
+            const rows = tbody.querySelectorAll('tr');
+            rows.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                let match = false;
+                for (let i = 1; i < cells.length - 1; i++) {
+                    const text = cells[i]?.textContent?.toLowerCase() || '';
+                    if (text.includes(query)) { match = true; break; }
+                }
+                row.style.display = match || query === '' ? '' : 'none';
+            });
+        }
+
+        function generateId() {
+            return Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
+        }
+
+        // ============================================================
+        // GELİR İŞLEMLERİ (Firebase)
+        // ============================================================
+        const salesBody = document.getElementById('salesBody');
+        const salesSearch = document.getElementById('salesSearch');
+        const salesRowCount = document.getElementById('salesRowCount');
+
+        let salesData = [];
+
+        function renderSales() {
+            salesBody.innerHTML = '';
+            if (salesData.length === 0) {
+                salesBody.innerHTML =
+                '<tr><td colspan="8" class="text-center text-muted">Henüz gelir kaydı yok</td></tr>';
+                salesRowCount.textContent = '0 satır';
+                return;
+            }
+
+            salesData.forEach((item, index) => {
+                const tr = document.createElement('tr');
+                const payBadge = item.odeme === 'Havale' ? 'havale' : 'nakit';
+                const havaleText = item.odeme === 'Havale' ? (item.havaleAlan || '—') : '—';
+                tr.innerHTML = `
+                        <td>${index + 1}</td>
+                        <td>${escapeHtml(item.musteri || '(isimsiz)')}</td>
+                        <td><span class="product-badge">${escapeHtml(item.urun || '(ürün yok)')}</span></td>
+                        <td><span class="type-badge ${payBadge}">${item.odeme}</span></td>
+                        <td>${escapeHtml(havaleText)}</td>
+                        <td>${formatAmount(item.tutar)}</td>
+                        <td>${escapeHtml(item.tarih || '')}</td>
+                        <td><button class="btn btn-sm btn-outline-danger remove-sales-btn" data-id="${item.id}"><i class="fas fa-times"></i></button></td>
+                    `;
+                salesBody.appendChild(tr);
+            });
+
+            // Silme butonları
+            salesBody.querySelectorAll('.remove-sales-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const id = this.dataset.id;
+                    if (confirm('Bu gelir kaydını silmek istediğinize emin misiniz?')) {
+                        salesRef.child(id).remove().then(() => {
+                            setSyncStatus('✅ Silindi', 'success');
+                        }).catch(err => {
+                            setSyncStatus('❌ Hata: ' + err.message, 'error');
+                        });
+                    }
+                });
+            });
+
+            salesRowCount.textContent = salesData.length + ' satır';
+        }
+
+        // Gelir dinleyici
+        salesRef.on('value', (snapshot) => {
+            const data = snapshot.val();
+            salesData = [];
+            if (data) {
+                Object.keys(data).forEach(key => {
+                    salesData.push({ id: key, ...data[key] });
+                });
+                // Tarihe göre sırala (yeniden eskiye)
+                salesData.sort((a, b) => (b.tarih || '').localeCompare(a.tarih || ''));
+            }
+            renderSales();
+            setSyncStatus('✅ Senkronize (' + salesData.length + ' gelir)', 'success');
+        }, (error) => {
+            setSyncStatus('❌ Bağlantı hatası: ' + error.message, 'error');
+        });
+
+        // Gelir ekleme
+        document.getElementById('addSalesBtn').addEventListener('click', function() {
+            const musteri = document.getElementById('salesCustomer').value.trim() || '(isimsiz)';
+            const urun = document.getElementById('salesProduct').value.trim() || '(ürün yok)';
+            const odeme = document.getElementById('salesPayment').value;
+            const tarih = document.getElementById('salesDate').value || getToday();
+            let havaleAlan = '';
+            if (odeme === 'Havale') {
+                havaleAlan = document.getElementById('salesHavaleNote').value.trim() || '(havale bilgisi yok)';
+            } else {
+                havaleAlan = '—';
+            }
+            const tutar = parseFloat(document.getElementById('salesAmount').value);
+            if (!tutar || tutar <= 0) {
+                alert('Geçerli bir tutar giriniz.');
+                return;
+            }
+
+            const newItem = {
+                musteri,
+                urun,
+                odeme,
+                tarih,
+                havaleAlan,
+                tutar,
+                createdAt: firebase.database.ServerValue.TIMESTAMP
+            };
+
+            const newRef = salesRef.push();
+            newRef.set(newItem).then(() => {
+                setSyncStatus('✅ Gelir eklendi', 'success');
+                document.getElementById('salesCustomer').value = '';
+                document.getElementById('salesProduct').value = '';
+                document.getElementById('salesAmount').value = '';
+                if (odeme === 'Havale') document.getElementById('salesHavaleNote').value = '';
+                document.getElementById('salesDate').value = getToday();
+            }).catch(err => {
+                setSyncStatus('❌ Hata: ' + err.message, 'error');
+            });
+        });
+
+        // Tüm gelirleri temizle
+        document.getElementById('clearSalesBtn').addEventListener('click', function() {
+            if (salesData.length === 0) return;
+            if (confirm('TÜM gelir kayıtları silinsin mi? (Bu işlem geri alınamaz!)')) {
+                salesRef.remove().then(() => {
+                    setSyncStatus('✅ Tüm gelirler silindi', 'success');
+                }).catch(err => {
+                    setSyncStatus('❌ Hata: ' + err.message, 'error');
+                });
+            }
+        });
+
+        // Gelir arama
+        salesSearch.addEventListener('input', function() {
+            filterTable(salesBody, salesSearch);
+            const visible = salesBody.querySelectorAll('tr:not([style*="display: none"])').length;
+            salesRowCount.textContent = visible + ' satır';
+        });
+
+        // ============================================================
+        // GİDER İŞLEMLERİ (Firebase)
+        // ============================================================
+        const expenseBody = document.getElementById('expenseBody');
+        const expenseSearch = document.getElementById('expenseSearch');
+        const expenseRowCount = document.getElementById('expenseRowCount');
+
+        let expenseData = [];
+
+        function renderExpenses() {
+            expenseBody.innerHTML = '';
+            if (expenseData.length === 0) {
+                expenseBody.innerHTML =
+                '<tr><td colspan="8" class="text-center text-muted">Henüz gider kaydı yok</td></tr>';
+                expenseRowCount.textContent = '0 satır';
+                return;
+            }
+
+            expenseData.forEach((item, index) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                        <td>${index + 1}</td>
+                        <td>${escapeHtml(item.kategori || '(kategori yok)')}</td>
+                        <td>${escapeHtml(item.urun || '(ürün yok)')}</td>
+                        <td>${escapeHtml(item.alici || '(alıcı yok)')}</td>
+                        <td>${formatAmount(item.tutar)}</td>
+                        <td>${escapeHtml(item.tarih || '')}</td>
+                        <td>${escapeHtml(item.not || '—')}</td>
+                        <td><button class="btn btn-sm btn-outline-danger remove-expense-btn" data-id="${item.id}"><i class="fas fa-times"></i></button></td>
+                    `;
+                expenseBody.appendChild(tr);
+            });
+
+            expenseBody.querySelectorAll('.remove-expense-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const id = this.dataset.id;
+                    if (confirm('Bu gider kaydını silmek istediğinize emin misiniz?')) {
+                        expenseRef.child(id).remove().then(() => {
+                            setSyncStatus('✅ Gider silindi', 'success');
+                        }).catch(err => {
+                            setSyncStatus('❌ Hata: ' + err.message, 'error');
+                        });
+                    }
+                });
+            });
+
+            expenseRowCount.textContent = expenseData.length + ' satır';
+        }
+
+        expenseRef.on('value', (snapshot) => {
+            const data = snapshot.val();
+            expenseData = [];
+            if (data) {
+                Object.keys(data).forEach(key => {
+                    expenseData.push({ id: key, ...data[key] });
+                });
+                expenseData.sort((a, b) => (b.tarih || '').localeCompare(a.tarih || ''));
+            }
+            renderExpenses();
+        }, (error) => {
+            setSyncStatus('❌ Gider bağlantı hatası: ' + error.message, 'error');
+        });
+
+        document.getElementById('addExpenseBtn').addEventListener('click', function() {
+            const kategori = document.getElementById('expenseCategory').value;
+            const urun = document.getElementById('expenseProduct').value.trim() || '(ürün yok)';
+            const alici = document.getElementById('expenseReceiver').value.trim() || '(alıcı yok)';
+            const tarih = document.getElementById('expenseDate').value || getToday();
+            const not = document.getElementById('expenseNote').value.trim() || '—';
+            const tutar = parseFloat(document.getElementById('expenseAmount').value);
+            if (!tutar || tutar <= 0) {
+                alert('Geçerli bir tutar giriniz.');
+                return;
+            }
+
+            const newItem = { kategori, urun, alici, tarih, not, tutar, createdAt: firebase.database.ServerValue
+                    .TIMESTAMP };
+            expenseRef.push(newItem).then(() => {
+                setSyncStatus('✅ Gider eklendi', 'success');
+                document.getElementById('expenseProduct').value = '';
+                document.getElementById('expenseReceiver').value = '';
+                document.getElementById('expenseAmount').value = '';
+                document.getElementById('expenseNote').value = '';
+                document.getElementById('expenseDate').value = getToday();
+            }).catch(err => {
+                setSyncStatus('❌ Hata: ' + err.message, 'error');
+            });
+        });
+
+        document.getElementById('clearExpenseBtn').addEventListener('click', function() {
+            if (expenseData.length === 0) return;
+            if (confirm('TÜM gider kayıtları silinsin mi?')) {
+                expenseRef.remove().then(() => {
+                    setSyncStatus('✅ Tüm giderler silindi', 'success');
+                }).catch(err => {
+                    setSyncStatus('❌ Hata: ' + err.message, 'error');
+                });
+            }
+        });
+
+        expenseSearch.addEventListener('input', function() {
+            filterTable(expenseBody, expenseSearch);
+            const visible = expenseBody.querySelectorAll('tr:not([style*="display: none"])').length;
+            expenseRowCount.textContent = visible + ' satır';
+        });
+
+        // ============================================================
+        // HAVALE ALACAK KİŞİLER (Firebase)
+        // ============================================================
+        let recipients = [];
+
+        function renderRecipients() {
+            const container = document.getElementById('recipientList');
+            const tagsContainer = document.getElementById('recipientTagsContainer');
+            container.innerHTML = '';
+            tagsContainer.innerHTML = '';
+
+            if (recipients.length === 0) {
+                container.innerHTML = '<span class="text-muted small">Henüz kişi eklenmemiş.</span>';
+                tagsContainer.innerHTML = '<span class="text-muted small">Listeden havale alacak kişi ekleyin.</span>';
+                return;
+            }
+
+            recipients.forEach((r, index) => {
+                const div = document.createElement('div');
+                div.className = 'management-tag';
+                div.innerHTML = `
+                        <strong>${escapeHtml(r.name)}</strong>
+                        ${r.note ? `<span class="bank-info">${escapeHtml(r.note)}</span>` : ''}
+                        <span class="remove-tag" data-id="${r.id}">✕</span>
+                    `;
+                container.appendChild(div);
+
+                const tag = document.createElement('span');
+                tag.className = 'recipient-tag';
+                tag.textContent = r.name;
+                tag.addEventListener('click', function() {
+                    document.getElementById('salesHavaleNote').value = r.name;
+                    document.getElementById('salesPayment').value = 'Havale';
+                    toggleSalesHavale();
+                });
+                tagsContainer.appendChild(tag);
+            });
+
+            container.querySelectorAll('.remove-tag').forEach(el => {
+                el.addEventListener('click', function() {
+                    const id = this.dataset.id;
+                    if (confirm('Bu kişiyi silmek istediğinize emin misiniz?')) {
+                        recipientsRef.child(id).remove().then(() => {
+                            setSyncStatus('✅ Kişi silindi', 'success');
+                        }).catch(err => {
+                            setSyncStatus('❌ Hata: ' + err.message, 'error');
+                        });
+                    }
+                });
+            });
+        }
+
+        recipientsRef.on('value', (snapshot) => {
+            const data = snapshot.val();
+            recipients = [];
+            if (data) {
+                Object.keys(data).forEach(key => {
+                    recipients.push({ id: key, ...data[key] });
+                });
+            }
+            renderRecipients();
+        });
+
+        document.getElementById('addRecipientBtn').addEventListener('click', function() {
+            const nameInput = document.getElementById('newRecipientName');
+            const noteInput = document.getElementById('newRecipientNote');
+            const name = nameInput.value.trim();
+            const note = noteInput.value.trim();
+            if (!name) { alert('Kişi adı giriniz.'); return; }
+            recipientsRef.push({ name, note }).then(() => {
+                setSyncStatus('✅ Kişi eklendi', 'success');
+                nameInput.value = '';
+                noteInput.value = '';
+            }).catch(err => {
+                setSyncStatus('❌ Hata: ' + err.message, 'error');
+            });
+        });
+
+        // ============================================================
+        // HAZIR GİDER KALEMLERİ (Firebase)
+        // ============================================================
+        let expenseTemplates = [];
+
+        function renderExpenseTemplates() {
+            const container = document.getElementById('expenseTemplateList');
+            const tagsContainer = document.getElementById('expenseTagsContainer');
+            container.innerHTML = '';
+            tagsContainer.innerHTML = '';
+
+            if (expenseTemplates.length === 0) {
+                container.innerHTML = '<span class="text-muted small">Henüz gider kalemi eklenmemiş.</span>';
+                tagsContainer.innerHTML = '<span class="text-muted small">Listeden gider kalemi ekleyin.</span>';
+                return;
+            }
+
+            expenseTemplates.forEach((e, index) => {
+                const div = document.createElement('div');
+                div.className = 'management-tag';
+                div.innerHTML = `
+                        <strong>${escapeHtml(e.kategori)}</strong> 
+                        ${escapeHtml(e.urun)} (${formatAmount(e.tutar)}₺)
+                        ${e.alici ? `- ${escapeHtml(e.alici)}` : ''}
+                        ${e.not ? `<span class="person-note">(${escapeHtml(e.not)})</span>` : ''}
+                        <span class="remove-tag" data-id="${e.id}">✕</span>
+                    `;
+                container.appendChild(div);
+
+                const tag = document.createElement('span');
+                tag.className = 'expense-quick-tag';
+                tag.textContent = `${e.urun} (${formatAmount(e.tutar)}₺)`;
+                tag.addEventListener('click', function() {
+                    document.getElementById('expenseCategory').value = e.kategori;
+                    document.getElementById('expenseProduct').value = e.urun;
+                    document.getElementById('expenseAmount').value = e.tutar;
+                    document.getElementById('expenseReceiver').value = e.alici || '';
+                    document.getElementById('expenseNote').value = e.not || '';
+                });
+                tagsContainer.appendChild(tag);
+            });
+
+            container.querySelectorAll('.remove-tag').forEach(el => {
+                el.addEventListener('click', function() {
+                    const id = this.dataset.id;
+                    if (confirm('Bu gider kalemini silmek istediğinize emin misiniz?')) {
+                        expenseTemplatesRef.child(id).remove().then(() => {
+                            setSyncStatus('✅ Gider kalemi silindi', 'success');
+                        }).catch(err => {
+                            setSyncStatus('❌ Hata: ' + err.message, 'error');
+                        });
+                    }
+                });
+            });
+        }
+
+        expenseTemplatesRef.on('value', (snapshot) => {
+            const data = snapshot.val();
+            expenseTemplates = [];
+            if (data) {
+                Object.keys(data).forEach(key => {
+                    expenseTemplates.push({ id: key, ...data[key] });
+                });
+            }
+            renderExpenseTemplates();
+        });
+
+        document.getElementById('addExpenseTemplateBtn').addEventListener('click', function() {
+            const kategori = document.getElementById('newExpenseCategory').value.trim();
+            const urun = document.getElementById('newExpenseProduct').value.trim();
+            const tutar = parseFloat(document.getElementById('newExpenseAmount').value);
+            const alici = document.getElementById('newExpenseReceiver').value.trim();
+            const not = document.getElementById('newExpenseNote').value.trim();
+
+            if (!kategori || !urun || !tutar || tutar <= 0) {
+                alert('Kategori, ürün adı ve geçerli bir tutar giriniz.');
+                return;
+            }
+            expenseTemplatesRef.push({ kategori, urun, tutar, alici, not }).then(() => {
+                setSyncStatus('✅ Gider kalemi eklendi', 'success');
+                document.getElementById('newExpenseCategory').value = '';
+                document.getElementById('newExpenseProduct').value = '';
+                document.getElementById('newExpenseAmount').value = '';
+                document.getElementById('newExpenseReceiver').value = '';
+                document.getElementById('newExpenseNote').value = '';
+            }).catch(err => {
+                setSyncStatus('❌ Hata: ' + err.message, 'error');
+            });
+        });
+
+        // ============================================================
+        // HAVALE TOGGLE
+        // ============================================================
+        const salesPayment = document.getElementById('salesPayment');
+        const salesHavaleNote = document.getElementById('salesHavaleNote');
+
+        function toggleSalesHavale() {
+            if (salesPayment.value === 'Havale') {
+                salesHavaleNote.disabled = false;
+                salesHavaleNote.placeholder = 'Havale alacak kişi bilgisi';
+            } else {
+                salesHavaleNote.disabled = true;
+                salesHavaleNote.value = '';
+                salesHavaleNote.placeholder = 'Havale seçili değil';
+            }
+        }
+        salesPayment.addEventListener('change', toggleSalesHavale);
+        toggleSalesHavale();
+
+        // ============================================================
+        // EXCEL RAPORLARI
+        // ============================================================
+        function buildColoredExcel() {
+            const salesRows = salesBody.querySelectorAll('tr');
+            const salesData = [
+                ['#', 'Müşteri', 'Ürün', 'Ödeme Türü', 'Havale Alan', 'Tutar (₺)', 'Tarih']
+            ];
+            let totalGelir = 0,
+                totalNakit = 0,
+                totalHavale = 0;
+            const customerMap = {};
+
+            salesRows.forEach(row => {
+                const cols = row.querySelectorAll('td');
+                if (cols.length >= 8) {
+                    const customer = cols[1].textContent.trim();
+                    const payText = cols[3].textContent.trim();
+                    const tutarStr = cols[5].textContent.trim();
+                    const tutarNum = parseTurkishNumber(tutarStr);
+                    totalGelir += tutarNum;
+                    if (payText === 'Nakit') totalNakit += tutarNum;
+                    else if (payText === 'Havale') totalHavale += tutarNum;
+                    if (!customerMap[customer]) customerMap[customer] = 0;
+                    customerMap[customer] += tutarNum;
+                    salesData.push([
+                        cols[0].textContent.trim(),
+                        customer,
+                        cols[2].textContent.trim(),
+                        payText,
+                        cols[4].textContent.trim(),
+                        tutarNum,
+                        cols[6].textContent.trim()
+                    ]);
+                }
+            });
+            salesData.push(['', '', '', '', 'TOPLAM', totalGelir, '']);
+
+            const expenseRows = expenseBody.querySelectorAll('tr');
+            const expenseData = [
+                ['#', 'Kategori', 'Ürün/Hizmet', 'Alıcı', 'Tutar (₺)', 'Tarih', 'Not']
+            ];
+            const categoryTotals = {};
+            let totalGider = 0;
+
+            expenseRows.forEach(row => {
+                const cols = row.querySelectorAll('td');
+                if (cols.length >= 8) {
+                    const category = cols[1].textContent.trim();
+                    const tutarStr = cols[4].textContent.trim();
+                    const tutarNum = parseTurkishNumber(tutarStr);
+                    if (!categoryTotals[category]) categoryTotals[category] = 0;
+                    categoryTotals[category] += tutarNum;
+                    totalGider += tutarNum;
+                    expenseData.push([
+                        cols[0].textContent.trim(),
+                        category,
+                        cols[2].textContent.trim(),
+                        cols[3].textContent.trim(),
+                        tutarNum,
+                        cols[5].textContent.trim(),
+                        cols[6].textContent.trim()
+                    ]);
+                }
+            });
+            expenseData.push(['', '', '', 'TOPLAM', totalGider, '', '']);
+
+            const summaryData = [
+                ['GELİR ÖZETİ'],
+                ['Toplam Gelir', totalGelir],
+                ['Nakit', totalNakit],
+                ['Havale', totalHavale],
+                [],
+                ['GİDER ÖZETİ (Kategori Bazında)'],
+                ['Kategori', 'Toplam Tutar']
+            ];
+            for (const [cat, val] of Object.entries(categoryTotals)) {
+                summaryData.push([cat, val]);
+            }
+            summaryData.push(['', '']);
+            summaryData.push(['Toplam Gider', totalGider]);
+            summaryData.push(['', '']);
+            summaryData.push(['NET DURUM', totalGelir - totalGider]);
+            summaryData.push(['', '']);
+            summaryData.push(['KİŞİ BAZLI GELİR']);
+            summaryData.push(['Müşteri', 'Toplam Gelir']);
+            for (const [cust, val] of Object.entries(customerMap)) {
+                summaryData.push([cust, val]);
+            }
+
+            const wb = XLSX.utils.book_new();
+
+            const wsSales = XLSX.utils.aoa_to_sheet(salesData);
+            wsSales['!cols'] = [{ wch: 5 }, { wch: 22 }, { wch: 20 }, { wch: 14 }, { wch: 30 }, { wch: 14 },
+            { wch: 16 }];
+            XLSX.utils.book_append_sheet(wb, wsSales, 'Gelir');
+
+            const wsExpense = XLSX.utils.aoa_to_sheet(expenseData);
+            wsExpense['!cols'] = [{ wch: 5 }, { wch: 18 }, { wch: 22 }, { wch: 20 }, { wch: 14 }, { wch: 16 },
+            { wch: 24 }];
+            XLSX.utils.book_append_sheet(wb, wsExpense, 'Gider');
+
+            const wsSummary = XLSX.utils.aoa_to_sheet(summaryData);
+            wsSummary['!cols'] = [{ wch: 28 }, { wch: 20 }];
+            XLSX.utils.book_append_sheet(wb, wsSummary, 'Özet');
+
+            return wb;
+        }
+
+        document.getElementById('exportCombinedExcel').addEventListener('click', function() {
+            const wb = buildColoredExcel();
+            XLSX.writeFile(wb, `gelir_gider_${getToday()}.xlsx`);
+        });
+
+        document.getElementById('exportPersonBasedExcel').addEventListener('click', function() {
+            const salesRows = salesBody.querySelectorAll('tr');
+            const customerMap = {};
+            salesRows.forEach(row => {
+                const cols = row.querySelectorAll('td');
+                if (cols.length >= 8) {
+                    const customer = cols[1].textContent.trim();
+                    const tutarStr = cols[5].textContent.trim();
+                    const tutarNum = parseTurkishNumber(tutarStr);
+                    if (!customerMap[customer]) customerMap[customer] = 0;
+                    customerMap[customer] += tutarNum;
+                }
+            });
+            if (Object.keys(customerMap).length === 0) {
+                alert('Henüz gelir kaydı yok.');
+                return;
+            }
+            const data = [
+                ['KİŞİ BAZLI GELİR RAPORU'],
+                ['Müşteri Adı', 'Toplam Gelir (₺)']
+            ];
+            let total = 0;
+            for (const [cust, val] of Object.entries(customerMap)) {
+                data.push([cust, val]);
+                total += val;
+            }
+            data.push(['', '']);
+            data.push(['GENEL TOPLAM', total]);
+
+            const wb = XLSX.utils.book_new();
+            const ws = XLSX.utils.aoa_to_sheet(data);
+            ws['!cols'] = [{ wch: 30 }, { wch: 20 }];
+            XLSX.utils.book_append_sheet(wb, ws, 'KisiBazli');
+            XLSX.writeFile(wb, `kisi_bazli_${getToday()}.xlsx`);
+        });
+
+        // ============================================================
+        // BAŞLANGIÇ
+        // ============================================================
+        // Tarihleri bugün ile doldur
+        document.getElementById('salesDate').value = getToday();
+        document.getElementById('expenseDate').value = getToday();
+
+        setSyncStatus('🔄 Veriler yükleniyor...', 'syncing');
+        console.log('✅ Firebase bağlantısı başlatıldı!');
+    </script>
+
+</body>
+</html>
