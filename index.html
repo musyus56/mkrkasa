@@ -227,6 +227,12 @@
             display: inline-block;
             border: 1px solid #e2e8f0;
             margin: 0.1rem;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .management-tag:hover {
+            background: #e9edf4;
+            border-color: #3b82f6;
         }
         .management-tag .remove-tag {
             cursor: pointer;
@@ -267,6 +273,122 @@
             border-radius: 30px;
             font-size: 0.7rem;
             font-weight: 600;
+        }
+
+        /* IBAN / NOT GÖSTERİM MODAL'ı */
+        .iban-modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.25s ease;
+        }
+        .iban-modal-overlay.active {
+            display: flex;
+        }
+        .iban-modal-box {
+            background: white;
+            padding: 2.5rem 3rem;
+            border-radius: 24px;
+            max-width: 700px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            position: relative;
+            animation: slideUp 0.3s ease;
+        }
+        .iban-modal-box .close-btn {
+            position: absolute;
+            top: 16px;
+            right: 20px;
+            font-size: 1.8rem;
+            cursor: pointer;
+            color: #94a3b8;
+            transition: 0.2s;
+            background: none;
+            border: none;
+        }
+        .iban-modal-box .close-btn:hover {
+            color: #1e293b;
+        }
+        .iban-modal-box .iban-label {
+            font-size: 0.8rem;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.25rem;
+        }
+        .iban-modal-box .iban-name {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 0.5rem;
+        }
+        .iban-modal-box .iban-content {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: #1e293b;
+            background: #f1f5f9;
+            padding: 1.2rem 1.5rem;
+            border-radius: 14px;
+            word-break: break-all;
+            font-family: 'Courier New', monospace;
+            letter-spacing: 1px;
+            margin-top: 0.5rem;
+            border: 2px dashed #dce2ec;
+            user-select: all;
+            cursor: pointer;
+        }
+        .iban-modal-box .iban-content:hover {
+            background: #e9edf4;
+            border-color: #3b82f6;
+        }
+        .iban-modal-box .copy-hint {
+            font-size: 0.75rem;
+            color: #94a3b8;
+            margin-top: 0.5rem;
+            text-align: center;
+        }
+        .iban-modal-box .copy-hint i {
+            margin-right: 4px;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+        @keyframes slideUp {
+            from {
+                transform: translateY(30px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* Kişi etiketlerinde IBAN varsa özel gösterim */
+        .management-tag .bank-info {
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .management-tag .bank-info:hover {
+            background: #bfdbfe;
+            transform: scale(1.02);
+        }
+        .management-tag .has-iban {
+            border-left: 3px solid #3b82f6;
         }
     </style>
 </head>
@@ -476,7 +598,7 @@
                                 <div class="card h-100">
                                     <div class="card-body">
                                         <h6 class="section-title"><i class="fas fa-user-plus me-1 text-primary"></i> Havale Alacak Kişiler</h6>
-                                        <p class="text-muted small">Bu kişilere havale göndereceksiniz. <strong>Notlar sadece burada görünür.</strong></p>
+                                        <p class="text-muted small">Bu kişilere havale göndereceksiniz. <strong>Not / IBAN'a tıklayarak büyük görün.</strong></p>
                                         <div class="d-flex gap-2 mb-3 flex-wrap">
                                             <input type="text" class="form-control" id="newRecipientName" placeholder="Kişi adı" style="flex:1; min-width:120px;" />
                                             <input type="text" class="form-control" id="newRecipientNote" placeholder="Banka / IBAN / Not" style="flex:2; min-width:150px;" />
@@ -526,8 +648,19 @@
 
             </div><!-- card-body -->
             <div class="card-footer bg-white border-0 text-center pt-0 pb-3">
-                <footer><i class="fas fa-database me-1"></i> Tüm veriler Firebase Realtime Database'de saklanır. Değişiklikler anında senkronize olur.</footer>
+                <footer><i class="fas fa-database me-1"></i> Tüm veriler Firebase'de saklanır. IBAN/Not'a tıklayarak büyütebilirsiniz.</footer>
             </div>
+        </div>
+    </div>
+
+    <!-- IBAN / NOT GÖSTERİM MODAL'ı -->
+    <div class="iban-modal-overlay" id="ibanModal">
+        <div class="iban-modal-box">
+            <button class="close-btn" id="ibanModalClose">&times;</button>
+            <div class="iban-label">💳 HAVALE ALACAK KİŞİ</div>
+            <div class="iban-name" id="ibanModalName">-</div>
+            <div class="iban-content" id="ibanModalContent">-</div>
+            <div class="copy-hint"><i class="fas fa-mouse-pointer"></i> Tıklayarak seçin, kopyalamak için Ctrl+C (Cmd+C)</div>
         </div>
     </div>
 
@@ -549,7 +682,6 @@
             appId: "1:775659718508:web:cf9b8ae7b72c3148af9549"
         };
 
-        // Firebase'i başlat
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
@@ -577,6 +709,34 @@
                 syncStatus.classList.add('sync-status');
             }
         }
+
+        // ============================================================
+        // IBAN MODAL
+        // ============================================================
+        const ibanModal = document.getElementById('ibanModal');
+        const ibanModalName = document.getElementById('ibanModalName');
+        const ibanModalContent = document.getElementById('ibanModalContent');
+        const ibanModalClose = document.getElementById('ibanModalClose');
+
+        function showIbanModal(name, content) {
+            ibanModalName.textContent = name;
+            ibanModalContent.textContent = content || '(Not girilmemiş)';
+            ibanModal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeIbanModal() {
+            ibanModal.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        ibanModalClose.addEventListener('click', closeIbanModal);
+        ibanModal.addEventListener('click', function(e) {
+            if (e.target === this) closeIbanModal();
+        });
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') closeIbanModal();
+        });
 
         // ============================================================
         // ORTAK YARDIMCILAR
@@ -625,10 +785,6 @@
             });
         }
 
-        function generateId() {
-            return Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
-        }
-
         // ============================================================
         // GELİR İŞLEMLERİ (Firebase)
         // ============================================================
@@ -664,7 +820,6 @@
                 salesBody.appendChild(tr);
             });
 
-            // Silme butonları
             salesBody.querySelectorAll('.remove-sales-btn').forEach(btn => {
                 btn.addEventListener('click', function() {
                     const id = this.dataset.id;
@@ -681,7 +836,6 @@
             salesRowCount.textContent = salesData.length + ' satır';
         }
 
-        // Gelir dinleyici
         salesRef.on('value', (snapshot) => {
             const data = snapshot.val();
             salesData = [];
@@ -689,7 +843,6 @@
                 Object.keys(data).forEach(key => {
                     salesData.push({ id: key, ...data[key] });
                 });
-                // Tarihe göre sırala (yeniden eskiye)
                 salesData.sort((a, b) => (b.tarih || '').localeCompare(a.tarih || ''));
             }
             renderSales();
@@ -698,7 +851,6 @@
             setSyncStatus('❌ Bağlantı hatası: ' + error.message, 'error');
         });
 
-        // Gelir ekleme
         document.getElementById('addSalesBtn').addEventListener('click', function() {
             const musteri = document.getElementById('salesCustomer').value.trim() || '(isimsiz)';
             const urun = document.getElementById('salesProduct').value.trim() || '(ürün yok)';
@@ -726,8 +878,7 @@
                 createdAt: firebase.database.ServerValue.TIMESTAMP
             };
 
-            const newRef = salesRef.push();
-            newRef.set(newItem).then(() => {
+            salesRef.push(newItem).then(() => {
                 setSyncStatus('✅ Gelir eklendi', 'success');
                 document.getElementById('salesCustomer').value = '';
                 document.getElementById('salesProduct').value = '';
@@ -739,7 +890,6 @@
             });
         });
 
-        // Tüm gelirleri temizle
         document.getElementById('clearSalesBtn').addEventListener('click', function() {
             if (salesData.length === 0) return;
             if (confirm('TÜM gelir kayıtları silinsin mi? (Bu işlem geri alınamaz!)')) {
@@ -751,7 +901,6 @@
             }
         });
 
-        // Gelir arama
         salesSearch.addEventListener('input', function() {
             filterTable(salesBody, salesSearch);
             const visible = salesBody.querySelectorAll('tr:not([style*="display: none"])').length;
@@ -865,7 +1014,7 @@
         });
 
         // ============================================================
-        // HAVALE ALACAK KİŞİLER (Firebase)
+        // HAVALE ALACAK KİŞİLER (Firebase) - IBAN MODAL ile
         // ============================================================
         let recipients = [];
 
@@ -882,15 +1031,30 @@
             }
 
             recipients.forEach((r, index) => {
+                const hasNote = r.note && r.note.trim().length > 0;
+
+                // Yönetim listesi - IBAN'a tıklanabilir
                 const div = document.createElement('div');
-                div.className = 'management-tag';
+                div.className = 'management-tag' + (hasNote ? ' has-iban' : '');
                 div.innerHTML = `
                         <strong>${escapeHtml(r.name)}</strong>
-                        ${r.note ? `<span class="bank-info">${escapeHtml(r.note)}</span>` : ''}
+                        ${hasNote ? `<span class="bank-info" data-name="${escapeHtml(r.name)}" data-note="${escapeHtml(r.note)}">${escapeHtml(r.note)}</span>` : ''}
                         <span class="remove-tag" data-id="${r.id}">✕</span>
                     `;
                 container.appendChild(div);
 
+                // IBAN/Not alanına tıklanınca modal aç
+                if (hasNote) {
+                    const bankInfo = div.querySelector('.bank-info');
+                    bankInfo.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        const name = this.dataset.name;
+                        const note = this.dataset.note;
+                        showIbanModal(name, note);
+                    });
+                }
+
+                // Gelir formundaki etiketler
                 const tag = document.createElement('span');
                 tag.className = 'recipient-tag';
                 tag.textContent = r.name;
@@ -902,6 +1066,7 @@
                 tagsContainer.appendChild(tag);
             });
 
+            // Silme işlemleri
             container.querySelectorAll('.remove-tag').forEach(el => {
                 el.addEventListener('click', function() {
                     const id = this.dataset.id;
@@ -1204,12 +1369,12 @@
         // ============================================================
         // BAŞLANGIÇ
         // ============================================================
-        // Tarihleri bugün ile doldur
         document.getElementById('salesDate').value = getToday();
         document.getElementById('expenseDate').value = getToday();
 
         setSyncStatus('🔄 Veriler yükleniyor...', 'syncing');
         console.log('✅ Firebase bağlantısı başlatıldı!');
+        console.log('💡 IBAN/Not alanlarına tıklayarak büyütebilirsiniz.');
     </script>
 
 </body>
