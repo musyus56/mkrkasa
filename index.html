@@ -1,4 +1,4 @@
-Tamam, şimdi büyük Nakit Bakiye alanını tamamen kaldırıyorum. Sadece sol üst köşedeki küçük badge kalıyor.
+Haklısınız, bakiye kartı gereksiz yere uzun ve yatay duruyor. Şimdi daha kompakt hale getiriyorum.
 
 ```html
 <!DOCTYPE html>
@@ -224,58 +224,41 @@ Tamam, şimdi büyük Nakit Bakiye alanını tamamen kaldırıyorum. Sadece sol 
             font-weight: 600;
         }
 
-        /* BAKİYE KARTI - KÜÇÜLTÜLDÜ */
+        /* KÜÇÜK KOMPAKT BAKİYE KARTI */
         .balance-card {
             background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-            border-radius: 20px;
-            padding: 1rem 1.5rem;
+            border-radius: 16px;
+            padding: 0.5rem 1.2rem;
             color: white;
-            box-shadow: 0 8px 25px rgba(15, 23, 42, 0.25);
-            position: relative;
-            min-height: 70px;
-        }
-        .balance-card .btn-edit-balance {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: #e2e8f0;
-            border-radius: 40px;
-            padding: 0.2rem 1.2rem;
-            font-size: 0.7rem;
-            transition: 0.2s;
-        }
-        .balance-card .btn-edit-balance:hover {
-            background: rgba(255, 255, 255, 0.2);
-            color: white;
-        }
-
-        /* SOL ÜST KÖŞEDE KÜÇÜK BADGE - KASA BAKİYESİ */
-        .balance-badge {
+            box-shadow: 0 4px 15px rgba(15, 23, 42, 0.2);
             display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 0px;
-            cursor: default;
-            flex: 1;
+            align-items: center;
+            justify-content: space-between;
+            min-height: 48px;
         }
-        .balance-badge .badge-count {
+        .balance-card .balance-badge {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .balance-card .balance-badge .badge-count {
             color: #64748b;
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             font-weight: 500;
         }
-        .balance-badge .badge-row {
+        .balance-card .balance-badge .badge-row {
             display: flex;
             align-items: center;
             gap: 4px;
-            margin-top: 1px;
         }
-        .balance-badge .badge-label {
+        .balance-card .balance-badge .badge-label {
             color: #94a3b8;
-            font-size: 0.6rem;
+            font-size: 0.55rem;
             text-transform: uppercase;
             letter-spacing: 0.5px;
             font-weight: 500;
         }
-        .balance-badge .badge-amount {
+        .balance-card .balance-badge .badge-amount {
             color: #4ade80;
             font-weight: 600;
             font-size: 0.95rem;
@@ -284,8 +267,22 @@ Tamam, şimdi büyük Nakit Bakiye alanını tamamen kaldırıyorum. Sadece sol 
             border-radius: 6px;
             transition: 0.2s;
         }
-        .balance-badge .badge-amount:hover {
+        .balance-card .balance-badge .badge-amount:hover {
             background: rgba(255, 255, 255, 0.05);
+        }
+        .balance-card .btn-edit-balance {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            color: #94a3b8;
+            border-radius: 30px;
+            padding: 0.15rem 0.9rem;
+            font-size: 0.65rem;
+            transition: 0.2s;
+            white-space: nowrap;
+        }
+        .balance-card .btn-edit-balance:hover {
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
         }
 
         /* MODAL */
@@ -362,9 +359,8 @@ Tamam, şimdi büyük Nakit Bakiye alanını tamamen kaldırıyorum. Sadece sol 
             </div>
             <div class="card-body p-4">
 
-                <!-- BAKİYE KARTI - KÜÇÜK -->
-                <div class="balance-card mb-4 d-flex flex-wrap justify-content-between align-items-center">
-                    <!-- SOL TARAF - KÜÇÜK BADGE -->
+                <!-- KOMPAKT BAKİYE KARTI -->
+                <div class="balance-card mb-3">
                     <div class="balance-badge">
                         <span class="badge-count" id="salesCountBadge">0 gelir</span>
                         <div class="badge-row">
@@ -372,10 +368,7 @@ Tamam, şimdi büyük Nakit Bakiye alanını tamamen kaldırıyorum. Sadece sol 
                             <span class="badge-amount" id="balanceBadge" onclick="openEditModal()">0,00 ₺</span>
                         </div>
                     </div>
-                    <!-- SAĞ TARAF - DÜZENLE BUTONU -->
-                    <div>
-                        <button class="btn-edit-balance" id="editBalanceBtn" onclick="openEditModal()"><i class="fas fa-pen me-1"></i>Düzenle</button>
-                    </div>
+                    <button class="btn-edit-balance" id="editBalanceBtn" onclick="openEditModal()"><i class="fas fa-pen me-1"></i>Düzenle</button>
                 </div>
 
                 <!-- Sekmeler -->
@@ -1241,19 +1234,18 @@ Tamam, şimdi büyük Nakit Bakiye alanını tamamen kaldırıyorum. Sadece sol 
         updateSalesCount(0);
         setSyncStatus('🔄 Yükleniyor...', 'syncing');
         console.log('✅ Kasa Yönetimi başlatıldı!');
-        console.log('📌 Büyük alan kaldırıldı, sadece sol üstte küçük badge kaldı.');
-        console.log('📌 "Kasa 460,00 ₺" yazısına tıkla -> Düzenleme modu açılır.');
+        console.log('📌 Kompakt bakiye kartı: sadece 48px yüksekliğinde.');
     </script>
 
 </body>
 </html>
 ```
 
-Büyük Alan Kaldırıldı - Sadece Küçük Badge Kaldı!
+Kompakt Bakiye Kartı - Artık Çok Daha Dar!
 
-Artık büyük Nakit Bakiye alanı tamamen kaldırıldı. Yerine:
+Bakiye kartını çok daha kompakt hale getirdim:
 
-· Küçük Badge: Sol üst köşede "33 gelir" ve altında "Kasa 460,00 ₺" şeklinde küçük bir badge.
-· Tıklanabilir: "Kasa 460,00 ₺" yazısına tıklayınca düzenleme modal'ı açılıyor.
-· Düzenle Butonu: Sağ tarafta küçük "Düzenle" butonu da aynı işlevi görüyor.
-· Sade ve Temiz: Ana ekran artık çok daha sade ve temiz görünüyor.
+· Yükseklik: Sadece 48px (önceki 100+ px idi)
+· İçerik: Sol tarafta "33 gelir" ve "Kasa 460,00 ₺", sağ tarafta küçük "Düzenle" butonu
+· Yatay Değil: Artık gereksiz yere uzun değil, sadece ihtiyaç kadar yer kaplıyor
+· Tıklanabilir: "Kasa 460,00 ₺" yazısına tıklayınca düzenleme açılıyor
