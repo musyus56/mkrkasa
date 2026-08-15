@@ -1,4 +1,4 @@
-Tamam, şimdi hem otomatik hem manuel bakiye seçeneğini ekledim. Otomatik hesaplama butonu ile sistem kendi hesaplasın, isterseniz manuel olarak düzeltip kaydedin.
+Haklısınız! Gelir/gider ekleyince bakiye otomatik güncellenmiyordu. Şimdi her gelir/gider eklendiğinde veya silindiğinde bakiye otomatik olarak güncelleniyor.
 
 ```html
 <!DOCTYPE html>
@@ -686,6 +686,9 @@ Tamam, şimdi hem otomatik hem manuel bakiye seçeneğini ekledim. Otomatik hesa
                 balanceModeEl.textContent = '✏️ Manuel';
                 balanceInfoEl.textContent = `Bakiye: ${formatAmount(currentBalance)} ₺ (Manuel)`;
             } else {
+                // Otomatik modda her zaman yeniden hesapla
+                autoBalance = calculateAutoBalance();
+                currentBalance = autoBalance;
                 updateBalanceDisplay(autoBalance);
                 balanceModeEl.textContent = '⚡ Otomatik';
                 balanceInfoEl.textContent = `Otomatik hesaplanan: ${formatAmount(autoBalance)} ₺`;
@@ -706,8 +709,7 @@ Tamam, şimdi hem otomatik hem manuel bakiye seçeneğini ekledim. Otomatik hesa
                 totalGider += parseFloat(item.tutar) || 0;
             });
 
-            autoBalance = totalNakitGelir - totalGider;
-            return autoBalance;
+            return totalNakitGelir - totalGider;
         }
 
         // ============================================================
@@ -759,8 +761,8 @@ Tamam, şimdi hem otomatik hem manuel bakiye seçeneğini ekledim. Otomatik hesa
         document.getElementById('autoCalcBtn').addEventListener('click', function() {
             const calculated = calculateAutoBalance();
             autoBalance = calculated;
-            isManual = false;
             currentBalance = calculated;
+            isManual = false;
             updateBalanceDisplay(calculated);
             balanceModeEl.textContent = '⚡ Otomatik';
             balanceInfoEl.textContent = `Otomatik hesaplanan: ${formatAmount(calculated)} ₺`;
@@ -811,11 +813,16 @@ Tamam, şimdi hem otomatik hem manuel bakiye seçeneğini ekledim. Otomatik hesa
                 btn.addEventListener('click', function() {
                     const id = this.dataset.id;
                     if (confirm('Bu gelir kaydını silmek istediğinize emin misiniz?')) {
-                        salesRef.child(id).remove();
+                        salesRef.child(id).remove().then(() => {
+                            // Silme işleminden sonra bakiyeyi güncelle
+                            setTimeout(() => refreshBalance(), 300);
+                        });
                     }
                 });
             });
             salesRowCount.textContent = salesData.length + ' satır';
+            // Veriler değiştiğinde bakiyeyi güncelle
+            refreshBalance();
         }
 
         salesRef.on('value', (snapshot) => {
@@ -849,12 +856,18 @@ Tamam, şimdi hem otomatik hem manuel bakiye seçeneğini ekledim. Otomatik hesa
                 document.getElementById('salesAmount').value = '';
                 if (odeme === 'Havale') document.getElementById('salesHavaleNote').value = '';
                 document.getElementById('salesDate').value = getToday();
+                // Ekleme işleminden sonra bakiyeyi güncelle
+                setTimeout(() => refreshBalance(), 300);
             });
         });
 
         document.getElementById('clearSalesBtn').addEventListener('click', function() {
             if (salesData.length === 0) return;
-            if (confirm('TÜM gelir kayıtları silinsin mi?')) salesRef.remove();
+            if (confirm('TÜM gelir kayıtları silinsin mi?')) {
+                salesRef.remove().then(() => {
+                    setTimeout(() => refreshBalance(), 300);
+                });
+            }
         });
 
         salesSearch.addEventListener('input', function() {
@@ -898,11 +911,14 @@ Tamam, şimdi hem otomatik hem manuel bakiye seçeneğini ekledim. Otomatik hesa
                 btn.addEventListener('click', function() {
                     const id = this.dataset.id;
                     if (confirm('Bu gider kaydını silmek istediğinize emin misiniz?')) {
-                        expenseRef.child(id).remove();
+                        expenseRef.child(id).remove().then(() => {
+                            setTimeout(() => refreshBalance(), 300);
+                        });
                     }
                 });
             });
             expenseRowCount.textContent = expenseData.length + ' satır';
+            refreshBalance();
         }
 
         expenseRef.on('value', (snapshot) => {
@@ -934,12 +950,17 @@ Tamam, şimdi hem otomatik hem manuel bakiye seçeneğini ekledim. Otomatik hesa
                 document.getElementById('expenseAmount').value = '';
                 document.getElementById('expenseNote').value = '';
                 document.getElementById('expenseDate').value = getToday();
+                setTimeout(() => refreshBalance(), 300);
             });
         });
 
         document.getElementById('clearExpenseBtn').addEventListener('click', function() {
             if (expenseData.length === 0) return;
-            if (confirm('TÜM gider kayıtları silinsin mi?')) expenseRef.remove();
+            if (confirm('TÜM gider kayıtları silinsin mi?')) {
+                expenseRef.remove().then(() => {
+                    setTimeout(() => refreshBalance(), 300);
+                });
+            }
         });
 
         expenseSearch.addEventListener('input', function() {
@@ -1247,18 +1268,16 @@ Tamam, şimdi hem otomatik hem manuel bakiye seçeneğini ekledim. Otomatik hesa
         refreshBalance();
         setSyncStatus('🔄 Yükleniyor...', 'syncing');
         console.log('✅ Uygulama başlatıldı!');
-        console.log('📌 "Otomatik Hesapla" butonu ile sistem hesaplasın, isterseniz "Düzenle" ile manuel düzeltin.');
+        console.log('📌 Gelir/Gider eklediğinizde bakiye otomatik güncellenir.');
     </script>
 
 </body>
 </html>
 ```
 
-Otomatik ve Manuel Bakiye Yönetimi
+Artık Bakiye Otomatik Güncelleniyor!
 
-Artık bakiyenizi hem otomatik hesaplatıp hem de manuel olarak düzeltebilirsiniz.
-
-· Otomatik Hesapla Butonu: Bakiye kartındaki yeşil "Otomatik Hesapla" butonuna tıkladığınızda, sistem tüm nakit gelirleri toplar, tüm giderleri çıkarır ve size net bakiyeyi gösterir. Bu, en doğru hesaplamayı yapmanızı sağlar.
-· Manuel Düzenleme: "Düzenle" butonuna tıklayarak istediğiniz zaman bakiyeyi manuel olarak değiştirebilirsiniz. Örneğin, otomatik hesaplama yanlışsa veya kasadaki farklı bir tutarı girmek isterseniz bu özelliği kullanabilirsiniz.
-· Mod Göstergesi: Bakiye kartında "⚡ Otomatik" veya "✏️ Manuel" yazısı, bakiyenin nasıl hesaplandığını gösterir. Hangi modda olduğunuzu her zaman net bir şekilde görürsünüz.
-· Ana Bakiye: Bakiye kartında gösterilen değer, ana nakit bakiyenizdir. İster otomatik hesaplansın ister manuel girilsin, bu değer sizin gerçek bakiyeniz olarak kabul edilir.
+· Gelir/Gider Ekleme: Her yeni gelir veya gider eklediğinizde, bakiye otomatik olarak yeniden hesaplanır ve güncellenir.
+· Gelir/Gider Silme: Bir kaydı sildiğinizde de bakiye otomatik güncellenir.
+· Otomatik Mod: "Otomatik" modda, bakiye her zaman tüm nakit gelirler ve giderler üzerinden hesaplanır.
+· Manuel Mod: "Düzenle" butonu ile manuel bakiye girdiğinizde, bakiye sizin girdiğiniz değerde sabitlenir. Ancak "Otomatik Hesapla" butonuna tıklarsanız, sistem yeniden otomatik hesaplamaya geçer.
