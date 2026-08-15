@@ -1,12 +1,9 @@
-Tamam, şimdi en basit ve kesin çözüm ile geliyorum. Firebase'den gelen verileri tamamen görmezden geliyoruz ve sadece sizin girdiğiniz değeri kullanıyoruz.
-
-```html
 <!DOCTYPE html>
 <html lang="tr">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Gelir & Gider Yönetimi - Nakit Bakiye (SON)</title>
+    <title>Gelir & Gider Yönetimi - Nakit Bakiye</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" />
     <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js">
     </script>
@@ -482,7 +479,7 @@ Tamam, şimdi en basit ve kesin çözüm ile geliyorum. Firebase'den gelen veril
                     </div>
                 </div>
 
-                <!-- Sekmeler -->
+                <!-- Sekmeler (Kısa) -->
                 <ul class="nav nav-pills mb-3" id="myTab" role="tablist">
                     <li class="nav-item" role="presentation">
                         <button class="nav-link active" id="sales-tab" data-bs-toggle="tab" data-bs-target="#sales" type="button" role="tab">
@@ -502,12 +499,11 @@ Tamam, şimdi en basit ve kesin çözüm ile geliyorum. Firebase'den gelen veril
                 </ul>
 
                 <div class="tab-content" id="myTabContent">
-
                     <!-- GELİR -->
                     <div class="tab-pane fade show active" id="sales" role="tabpanel">
                         <div class="row g-4">
                             <div class="col-lg-5">
-                                <div class="bg-light p-3 rounded-4" style="background:#fafcff!important;">
+                                <div class="bg-light p-3 rounded-4">
                                     <h6 class="section-title"><i class="fas fa-pen-alt me-1 text-primary"></i> Yeni Gelir</h6>
                                     <form id="salesForm" novalidate>
                                         <div class="row g-3">
@@ -565,9 +561,7 @@ Tamam, şimdi en basit ve kesin çözüm ile geliyorum. Firebase'den gelen veril
                                 <div class="table-responsive">
                                     <table class="table table-hover align-middle mb-0" id="salesTable">
                                         <thead>
-                                            <tr>
-                                                <th>#</th><th>Müşteri</th><th>Ürün</th><th>Ödeme</th><th>Havale Alan</th><th>Tutar</th><th>Tarih</th><th></th>
-                                            </tr>
+                                            <tr><th>#</th><th>Müşteri</th><th>Ürün</th><th>Ödeme</th><th>Havale Alan</th><th>Tutar</th><th>Tarih</th><th></th></tr>
                                         </thead>
                                         <tbody id="salesBody"></tbody>
                                     </table>
@@ -580,7 +574,7 @@ Tamam, şimdi en basit ve kesin çözüm ile geliyorum. Firebase'den gelen veril
                     <div class="tab-pane fade" id="expense" role="tabpanel">
                         <div class="row g-4">
                             <div class="col-lg-5">
-                                <div class="bg-light p-3 rounded-4" style="background:#fafcff!important;">
+                                <div class="bg-light p-3 rounded-4">
                                     <h6 class="section-title"><i class="fas fa-wallet me-1 text-danger"></i> Yeni Gider</h6>
                                     <form id="expenseForm" novalidate>
                                         <div class="row g-3">
@@ -642,9 +636,7 @@ Tamam, şimdi en basit ve kesin çözüm ile geliyorum. Firebase'den gelen veril
                                 <div class="table-responsive">
                                     <table class="table table-hover align-middle mb-0" id="expenseTable">
                                         <thead>
-                                            <tr>
-                                                <th>#</th><th>Kategori</th><th>Ürün/Hizmet</th><th>Alıcı</th><th>Tutar</th><th>Tarih</th><th>Not</th><th></th>
-                                            </tr>
+                                            <tr><th>#</th><th>Kategori</th><th>Ürün/Hizmet</th><th>Alıcı</th><th>Tutar</th><th>Tarih</th><th>Not</th><th></th></tr>
                                         </thead>
                                         <tbody id="expenseBody"></tbody>
                                     </table>
@@ -660,7 +652,6 @@ Tamam, şimdi en basit ve kesin çözüm ile geliyorum. Firebase'den gelen veril
                                 <div class="card h-100">
                                     <div class="card-body">
                                         <h6 class="section-title"><i class="fas fa-user-plus me-1 text-primary"></i> Havale Alacak Kişiler</h6>
-                                        <p class="text-muted small">Bu kişilere havale göndereceksiniz.</p>
                                         <div class="d-flex gap-2 mb-3 flex-wrap">
                                             <input type="text" class="form-control" id="newRecipientName" placeholder="Kişi adı" style="flex:1; min-width:120px;" />
                                             <input type="text" class="form-control" id="newRecipientNote" placeholder="Banka / IBAN / Not" style="flex:2; min-width:150px;" />
@@ -674,7 +665,6 @@ Tamam, şimdi en basit ve kesin çözüm ile geliyorum. Firebase'den gelen veril
                                 <div class="card h-100">
                                     <div class="card-body">
                                         <h6 class="section-title"><i class="fas fa-tag me-1 text-danger"></i> Hazır Gider Kalemleri</h6>
-                                        <p class="text-muted small">Sık kullandığınız giderleri buraya ekleyin.</p>
                                         <div class="d-flex gap-2 mb-3 flex-wrap">
                                             <input type="text" class="form-control" id="newExpenseCategory" placeholder="Kategori" style="flex:1; min-width:80px;" />
                                             <input type="text" class="form-control" id="newExpenseProduct" placeholder="Ürün adı" style="flex:1; min-width:80px;" />
@@ -689,21 +679,15 @@ Tamam, şimdi en basit ve kesin çözüm ile geliyorum. Firebase'den gelen veril
                             </div>
                         </div>
                     </div>
-
                 </div>
 
-                <!-- EXCEL BUTONLARI -->
+                <!-- EXCEL -->
                 <div class="row mt-4">
                     <div class="col-12 d-flex justify-content-center gap-3 flex-wrap">
-                        <button class="btn btn-success btn-lg" id="exportCombinedExcel">
-                            <i class="fas fa-file-excel me-2"></i> Excel İndir
-                        </button>
-                        <button class="btn btn-info btn-lg text-white" id="exportPersonBasedExcel">
-                            <i class="fas fa-user me-2"></i> Kişi Bazlı Rapor
-                        </button>
+                        <button class="btn btn-success btn-lg" id="exportCombinedExcel"><i class="fas fa-file-excel me-2"></i> Excel İndir</button>
+                        <button class="btn btn-info btn-lg text-white" id="exportPersonBasedExcel"><i class="fas fa-user me-2"></i> Kişi Bazlı Rapor</button>
                     </div>
                 </div>
-
             </div>
             <div class="card-footer bg-white border-0 text-center pt-0 pb-3">
                 <footer><i class="fas fa-database me-1"></i> Tüm veriler Firebase'de saklanır.</footer>
@@ -749,7 +733,7 @@ Tamam, şimdi en basit ve kesin çözüm ile geliyorum. Firebase'den gelen veril
 
     <script>
         // ============================================================
-        // FIREBASE KONFIG
+        // FIREBASE
         // ============================================================
         const firebaseConfig = {
             apiKey: "AIzaSyAyDVAK9r-1YJmlDHoatdqyS49Lm7-19as",
@@ -760,13 +744,9 @@ Tamam, şimdi en basit ve kesin çözüm ile geliyorum. Firebase'den gelen veril
             messagingSenderId: "775659718508",
             appId: "1:775659718508:web:cf9b8ae7b72c3148af9549"
         };
-
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // ============================================================
-        // REFERANSLAR
-        // ============================================================
         const salesRef = db.ref('gelirler');
         const expenseRef = db.ref('giderler');
         const recipientsRef = db.ref('havaleAlacakKisiler');
@@ -774,31 +754,16 @@ Tamam, şimdi en basit ve kesin çözüm ile geliyorum. Firebase'den gelen veril
         const balanceRef = db.ref('nakitBakiye');
 
         // ============================================================
-        // DURUM
-        // ============================================================
-        const syncStatus = document.getElementById('syncStatus');
-
-        function setSyncStatus(text, type = 'success') {
-            syncStatus.innerHTML = text;
-            syncStatus.className = 'badge bg-light text-secondary';
-            if (type === 'syncing') syncStatus.classList.add('syncing');
-            else if (type === 'error') syncStatus.classList.add('error');
-            else syncStatus.classList.add('sync-status');
-        }
-
-        // ============================================================
-        // BAKİYE - SADECE MANUEL DEĞER (FIREBASE'DEN GELENİ KULLANMA)
+        // BAKİYE - SADECE MANUEL (Firebase'den gelen balance KULLANILMAZ)
         // ============================================================
         const balanceAmountEl = document.getElementById('balanceAmount');
         const balanceModeEl = document.getElementById('balanceMode');
         const balanceInfoEl = document.getElementById('balanceInfo');
         const currentBalanceDisplay = document.getElementById('currentBalanceDisplay');
 
-        // BAKİYE: Sadece manuel olarak ayarlanır, Firebase'den gelen değer KULLANILMAZ
         let currentBalance = 0;
         let isManualBalance = false;
         let manualBaseBalance = 0;
-        let isInitialized = false;
 
         function calculateBalance(salesData, expenseData) {
             let totalNakitGelir = 0;
@@ -814,10 +779,8 @@ Tamam, şimdi en basit ve kesin çözüm ile geliyorum. Firebase'den gelen veril
             });
 
             if (isManualBalance) {
-                // Manuel mod: BASE + nakit gelirler - giderler
                 return manualBaseBalance + totalNakitGelir - totalGider;
             } else {
-                // Otomatik mod: sadece nakit gelirler - giderler
                 return totalNakitGelir - totalGider;
             }
         }
@@ -834,15 +797,6 @@ Tamam, şimdi en basit ve kesin çözüm ile geliyorum. Firebase'den gelen veril
             currentBalance = newBalance;
             updateBalanceDisplay(newBalance);
 
-            // Firebase'e sadece balance'ı güncelle, mod bilgisini DEĞİŞTİRME
-            if (isInitialized) {
-                balanceRef.update({
-                    balance: newBalance,
-                    updatedAt: firebase.database.ServerValue.TIMESTAMP
-                }).catch(err => console.error('Bakiye güncelleme hatası:', err));
-            }
-
-            // Mod bilgisini güncelle
             if (isManualBalance) {
                 balanceModeEl.textContent = '✏️ Manuel';
                 balanceInfoEl.textContent = `Başlangıç: ${formatAmount(manualBaseBalance)} ₺ + Nakit Gelirler - Giderler`;
@@ -852,61 +806,14 @@ Tamam, şimdi en basit ve kesin çözüm ile geliyorum. Firebase'den gelen veril
             }
         }
 
-        // Firebase'den sadece manuel mod bilgisini al (balance değerini ALMA)
-        function loadBalanceMode() {
-            balanceRef.once('value').then((snapshot) => {
-                const data = snapshot.val();
-                if (data) {
-                    // Sadece manuel mod ve base değerini al, balance'ı KULLANMA
-                    isManualBalance = data.isManual || false;
-                    if (isManualBalance) {
-                        manualBaseBalance = data.manualBase || 0;
-                    }
-                }
-                isInitialized = true;
-                // Veriler geldikçe refreshBalance çağrılacak
-                refreshBalance(salesData, expenseData);
-            }).catch(err => {
-                console.error('Bakiye modu yüklenemedi:', err);
-                isInitialized = true;
-            });
-        }
-
-        loadBalanceMode();
-
         // ============================================================
-        // IBAN MODAL
-        // ============================================================
-        const ibanModal = document.getElementById('ibanModal');
-        const ibanModalName = document.getElementById('ibanModalName');
-        const ibanModalContent = document.getElementById('ibanModalContent');
-        const ibanModalClose = document.getElementById('ibanModalClose');
-
-        function showIbanModal(name, content) {
-            ibanModalName.textContent = name;
-            ibanModalContent.textContent = content || '(Not girilmemiş)';
-            ibanModal.classList.add('active');
-            document.body.style.overflow = 'hidden';
-        }
-
-        function closeIbanModal() {
-            ibanModal.classList.remove('active');
-            document.body.style.overflow = '';
-        }
-
-        ibanModalClose.addEventListener('click', closeIbanModal);
-        ibanModal.addEventListener('click', function(e) { if (e.target === this) closeIbanModal(); });
-        document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeIbanModal(); });
-
-        // ============================================================
-        // BAKİYE DÜZENLEME - SIFIRDAN AYARLA
+        // BAKİYE DÜZENLEME
         // ============================================================
         const editBalanceModal = document.getElementById('editBalanceModal');
         const manualBalanceInput = document.getElementById('manualBalanceInput');
 
         document.getElementById('editBalanceBtn').addEventListener('click', function() {
             manualBalanceInput.value = '';
-            manualBalanceInput.placeholder = 'Yeni bakiye girin...';
             document.getElementById('currentBalanceDisplay').textContent = formatAmount(currentBalance);
             editBalanceModal.classList.add('active');
             setTimeout(() => manualBalanceInput.focus(), 100);
@@ -923,14 +830,13 @@ Tamam, şimdi en basit ve kesin çözüm ile geliyorum. Firebase'den gelen veril
                 return;
             }
 
-            // SIFIRDAN AYARLA: Mevcut bakiye tamamen sıfırlanır, yeni değer atanır
+            // SIFIRDAN AYARLA
             isManualBalance = true;
             manualBaseBalance = val;
             currentBalance = val;
 
-            // Firebase'e kaydet
+            // Firebase'e sadece manuel mod bilgisini kaydet (balance'ı KENDİMİZ hesaplıyoruz)
             balanceRef.set({
-                balance: val,
                 isManual: true,
                 manualBase: val,
                 updatedAt: firebase.database.ServerValue.TIMESTAMP
@@ -1029,7 +935,6 @@ Tamam, şimdi en basit ve kesin çözüm ile geliyorum. Firebase'den gelen veril
                 salesRowCount.textContent = '0 satır';
                 return;
             }
-
             salesData.forEach((item, index) => {
                 const tr = document.createElement('tr');
                 const payBadge = item.odeme === 'Havale' ? 'havale' : 'nakit';
@@ -1051,17 +956,12 @@ Tamam, şimdi en basit ve kesin çözüm ile geliyorum. Firebase'den gelen veril
                 btn.addEventListener('click', function() {
                     const id = this.dataset.id;
                     if (confirm('Bu gelir kaydını silmek istediğinize emin misiniz?')) {
-                        salesRef.child(id).remove().then(() => {
-                            setSyncStatus('✅ Silindi', 'success');
-                        }).catch(err => {
-                            setSyncStatus('❌ Hata: ' + err.message, 'error');
-                        });
+                        salesRef.child(id).remove();
                     }
                 });
             });
-
             salesRowCount.textContent = salesData.length + ' satır';
-            if (isInitialized) refreshBalance(salesData, expenseData);
+            refreshBalance(salesData, expenseData);
         }
 
         salesRef.on('value', (snapshot) => {
@@ -1075,8 +975,6 @@ Tamam, şimdi en basit ve kesin çözüm ile geliyorum. Firebase'den gelen veril
             }
             renderSales();
             setSyncStatus('✅ ' + salesData.length + ' gelir', 'success');
-        }, (error) => {
-            setSyncStatus('❌ Hata: ' + error.message, 'error');
         });
 
         document.getElementById('addSalesBtn').addEventListener('click', function() {
@@ -1084,41 +982,25 @@ Tamam, şimdi en basit ve kesin çözüm ile geliyorum. Firebase'den gelen veril
             const urun = document.getElementById('salesProduct').value.trim() || '(ürün yok)';
             const odeme = document.getElementById('salesPayment').value;
             const tarih = document.getElementById('salesDate').value || getToday();
-            let havaleAlan = '';
-            if (odeme === 'Havale') {
-                havaleAlan = document.getElementById('salesHavaleNote').value.trim() || '(havale bilgisi yok)';
-            } else {
-                havaleAlan = '—';
-            }
+            let havaleAlan = odeme === 'Havale' ? (document.getElementById('salesHavaleNote').value.trim() ||
+                '(havale bilgisi yok)') : '—';
             const tutar = parseFloat(document.getElementById('salesAmount').value);
-            if (!tutar || tutar <= 0) {
-                alert('Geçerli bir tutar giriniz.');
-                return;
-            }
+            if (!tutar || tutar <= 0) { alert('Geçerli bir tutar giriniz.'); return; }
 
-            const newItem = { musteri, urun, odeme, tarih, havaleAlan, tutar, createdAt: firebase.database.ServerValue
-                    .TIMESTAMP };
-            salesRef.push(newItem).then(() => {
+            salesRef.push({ musteri, urun, odeme, tarih, havaleAlan, tutar, createdAt: firebase.database.ServerValue
+                    .TIMESTAMP }).then(() => {
                 setSyncStatus('✅ Gelir eklendi', 'success');
                 document.getElementById('salesCustomer').value = '';
                 document.getElementById('salesProduct').value = '';
                 document.getElementById('salesAmount').value = '';
                 if (odeme === 'Havale') document.getElementById('salesHavaleNote').value = '';
                 document.getElementById('salesDate').value = getToday();
-            }).catch(err => {
-                setSyncStatus('❌ Hata: ' + err.message, 'error');
             });
         });
 
         document.getElementById('clearSalesBtn').addEventListener('click', function() {
             if (salesData.length === 0) return;
-            if (confirm('TÜM gelir kayıtları silinsin mi?')) {
-                salesRef.remove().then(() => {
-                    setSyncStatus('✅ Tüm gelirler silindi', 'success');
-                }).catch(err => {
-                    setSyncStatus('❌ Hata: ' + err.message, 'error');
-                });
-            }
+            if (confirm('TÜM gelir kayıtları silinsin mi?')) salesRef.remove();
         });
 
         salesSearch.addEventListener('input', function() {
@@ -1143,7 +1025,6 @@ Tamam, şimdi en basit ve kesin çözüm ile geliyorum. Firebase'den gelen veril
                 expenseRowCount.textContent = '0 satır';
                 return;
             }
-
             expenseData.forEach((item, index) => {
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
@@ -1163,17 +1044,12 @@ Tamam, şimdi en basit ve kesin çözüm ile geliyorum. Firebase'den gelen veril
                 btn.addEventListener('click', function() {
                     const id = this.dataset.id;
                     if (confirm('Bu gider kaydını silmek istediğinize emin misiniz?')) {
-                        expenseRef.child(id).remove().then(() => {
-                            setSyncStatus('✅ Gider silindi', 'success');
-                        }).catch(err => {
-                            setSyncStatus('❌ Hata: ' + err.message, 'error');
-                        });
+                        expenseRef.child(id).remove();
                     }
                 });
             });
-
             expenseRowCount.textContent = expenseData.length + ' satır';
-            if (isInitialized) refreshBalance(salesData, expenseData);
+            refreshBalance(salesData, expenseData);
         }
 
         expenseRef.on('value', (snapshot) => {
@@ -1186,8 +1062,6 @@ Tamam, şimdi en basit ve kesin çözüm ile geliyorum. Firebase'den gelen veril
                 expenseData.sort((a, b) => (b.tarih || '').localeCompare(a.tarih || ''));
             }
             renderExpenses();
-        }, (error) => {
-            setSyncStatus('❌ Gider hatası: ' + error.message, 'error');
         });
 
         document.getElementById('addExpenseBtn').addEventListener('click', function() {
@@ -1197,34 +1071,22 @@ Tamam, şimdi en basit ve kesin çözüm ile geliyorum. Firebase'den gelen veril
             const tarih = document.getElementById('expenseDate').value || getToday();
             const not = document.getElementById('expenseNote').value.trim() || '—';
             const tutar = parseFloat(document.getElementById('expenseAmount').value);
-            if (!tutar || tutar <= 0) {
-                alert('Geçerli bir tutar giriniz.');
-                return;
-            }
+            if (!tutar || tutar <= 0) { alert('Geçerli bir tutar giriniz.'); return; }
 
-            const newItem = { kategori, urun, alici, tarih, not, tutar, createdAt: firebase.database.ServerValue
-                    .TIMESTAMP };
-            expenseRef.push(newItem).then(() => {
+            expenseRef.push({ kategori, urun, alici, tarih, not, tutar, createdAt: firebase.database.ServerValue
+                    .TIMESTAMP }).then(() => {
                 setSyncStatus('✅ Gider eklendi', 'success');
                 document.getElementById('expenseProduct').value = '';
                 document.getElementById('expenseReceiver').value = '';
                 document.getElementById('expenseAmount').value = '';
                 document.getElementById('expenseNote').value = '';
                 document.getElementById('expenseDate').value = getToday();
-            }).catch(err => {
-                setSyncStatus('❌ Hata: ' + err.message, 'error');
             });
         });
 
         document.getElementById('clearExpenseBtn').addEventListener('click', function() {
             if (expenseData.length === 0) return;
-            if (confirm('TÜM gider kayıtları silinsin mi?')) {
-                expenseRef.remove().then(() => {
-                    setSyncStatus('✅ Tüm giderler silindi', 'success');
-                }).catch(err => {
-                    setSyncStatus('❌ Hata: ' + err.message, 'error');
-                });
-            }
+            if (confirm('TÜM gider kayıtları silinsin mi?')) expenseRef.remove();
         });
 
         expenseSearch.addEventListener('input', function() {
@@ -1262,8 +1124,7 @@ Tamam, şimdi en basit ve kesin çözüm ile geliyorum. Firebase'den gelen veril
                 container.appendChild(div);
 
                 if (hasNote) {
-                    const bankInfo = div.querySelector('.bank-info');
-                    bankInfo.addEventListener('click', function(e) {
+                    div.querySelector('.bank-info').addEventListener('click', function(e) {
                         e.stopPropagation();
                         showIbanModal(this.dataset.name, this.dataset.note);
                     });
@@ -1302,17 +1163,13 @@ Tamam, şimdi en basit ve kesin çözüm ile geliyorum. Firebase'den gelen veril
         });
 
         document.getElementById('addRecipientBtn').addEventListener('click', function() {
-            const nameInput = document.getElementById('newRecipientName');
-            const noteInput = document.getElementById('newRecipientNote');
-            const name = nameInput.value.trim();
-            const note = noteInput.value.trim();
+            const name = document.getElementById('newRecipientName').value.trim();
+            const note = document.getElementById('newRecipientNote').value.trim();
             if (!name) { alert('Kişi adı giriniz.'); return; }
             recipientsRef.push({ name, note }).then(() => {
                 setSyncStatus('✅ Kişi eklendi', 'success');
-                nameInput.value = '';
-                noteInput.value = '';
-            }).catch(err => {
-                setSyncStatus('❌ Hata: ' + err.message, 'error');
+                document.getElementById('newRecipientName').value = '';
+                document.getElementById('newRecipientNote').value = '';
             });
         });
 
@@ -1397,8 +1254,6 @@ Tamam, şimdi en basit ve kesin çözüm ile geliyorum. Firebase'den gelen veril
                 document.getElementById('newExpenseAmount').value = '';
                 document.getElementById('newExpenseReceiver').value = '';
                 document.getElementById('newExpenseNote').value = '';
-            }).catch(err => {
-                setSyncStatus('❌ Hata: ' + err.message, 'error');
             });
         });
 
@@ -1420,6 +1275,30 @@ Tamam, şimdi en basit ve kesin çözüm ile geliyorum. Firebase'den gelen veril
         }
         salesPayment.addEventListener('change', toggleSalesHavale);
         toggleSalesHavale();
+
+        // ============================================================
+        // IBAN MODAL
+        // ============================================================
+        const ibanModal = document.getElementById('ibanModal');
+        const ibanModalName = document.getElementById('ibanModalName');
+        const ibanModalContent = document.getElementById('ibanModalContent');
+        const ibanModalClose = document.getElementById('ibanModalClose');
+
+        function showIbanModal(name, content) {
+            ibanModalName.textContent = name;
+            ibanModalContent.textContent = content || '(Not girilmemiş)';
+            ibanModal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeIbanModal() {
+            ibanModal.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        ibanModalClose.addEventListener('click', closeIbanModal);
+        ibanModal.addEventListener('click', function(e) { if (e.target === this) closeIbanModal(); });
+        document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeIbanModal(); });
 
         // ============================================================
         // EXCEL
@@ -1585,20 +1464,8 @@ Tamam, şimdi en basit ve kesin çözüm ile geliyorum. Firebase'den gelen veril
         document.getElementById('expenseDate').value = getToday();
 
         setSyncStatus('🔄 Yükleniyor...', 'syncing');
-        console.log('✅ Firebase bağlantısı başlatıldı!');
-        console.log('💵 Bakiye SADECE sizin girdiğiniz değerle ayarlanır.');
-        console.log('📌 Örnek: 16.500 ₺ varken 500 ₺ girerseniz, bakiye 500 ₺ olur.');
+        console.log('✅ Bakiye SADECE manuel ayarlanır, Firebase\'den gelen balance KULLANILMAZ!');
+        console.log('📌 16.500 ₺ varken 500 ₺ girerseniz, bakiye 500 ₺ olur.');
     </script>
-
 </body>
 </html>
-```
-
-SON ÇÖZÜM - Bakiye Sadece Sizin Girdiğiniz Değer!
-
-Şimdi kesin olarak çalışıyor. Sorun şuydu: Firebase'den gelen balance değeri sürekli olarak mevcut bakiyeyi ezerek üzerine ekliyordu. Şimdi bu tamamen düzeltildi.
-
-· Bakiye Sadece Manuel: Firebase'den gelen balance değeri tamamen ignore ediliyor. Sadece sizin "Kaydet" butonuna tıklayarak girdiğiniz değer kullanılıyor.
-· Toplama Kesinlikle YOK: 16.500 ₺ varken 500 ₺ girerseniz, bakiye 500 ₺ olur. Üzerine ekleme yapılmaz.
-· Nasıl Çalışır:
-  1. "Düzen
