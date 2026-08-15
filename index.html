@@ -1,4 +1,4 @@
-Haklısınız, çok fazla deneme yaptık ve her şey karıştı. Şimdi en temel ve çalışan haliyle sıfırdan başlıyorum. Sadece ihtiyacınız olan özellikleri içeren, temiz bir çözüm sunuyorum.
+Tamam, şimdi hem otomatik hem manuel bakiye seçeneğini ekledim. Otomatik hesaplama butonu ile sistem kendi hesaplasın, isterseniz manuel olarak düzeltip kaydedin.
 
 ```html
 <!DOCTYPE html>
@@ -99,6 +99,14 @@ Haklısınız, çok fazla deneme yaptık ve her şey karıştı. Şimdi en temel
         }
         .btn-danger:hover {
             background: #dc2626;
+        }
+        .btn-warning {
+            background: #f59e0b;
+            border: none;
+            color: white;
+        }
+        .btn-warning:hover {
+            background: #d97706;
         }
         .search-box {
             position: relative;
@@ -233,7 +241,6 @@ Haklısınız, çok fazla deneme yaptık ve her şey karıştı. Şimdi en temel
             padding: 0.1rem 0.5rem;
             border-radius: 20px;
             display: inline-block;
-            cursor: pointer;
         }
         .sync-status {
             font-size: 0.8rem;
@@ -308,6 +315,19 @@ Haklısınız, çok fazla deneme yaptık ve her şey karıştı. Şimdi en temel
             border-radius: 30px;
             color: #94a3b8;
         }
+        .balance-card .btn-auto-calc {
+            background: rgba(74, 222, 128, 0.15);
+            border: 1px solid rgba(74, 222, 128, 0.3);
+            color: #4ade80;
+            border-radius: 40px;
+            padding: 0.2rem 1.2rem;
+            font-size: 0.75rem;
+            transition: 0.2s;
+        }
+        .balance-card .btn-auto-calc:hover {
+            background: rgba(74, 222, 128, 0.25);
+            color: #86efac;
+        }
         .edit-balance-modal-overlay {
             display: none;
             position: fixed;
@@ -340,6 +360,10 @@ Haklısınız, çok fazla deneme yaptık ve her şey karıştı. Şimdi en temel
             border-radius: 10px;
             margin-top: 0.5rem;
         }
+        .edit-balance-modal-box .info-text {
+            font-size: 0.8rem;
+            color: #64748b;
+        }
     </style>
 </head>
 <body>
@@ -368,6 +392,7 @@ Haklısınız, çok fazla deneme yaptık ve her şey karıştı. Şimdi en temel
                     </div>
                     <div class="d-flex flex-wrap align-items-center gap-2">
                         <span class="balance-mode" id="balanceMode">⚡ Otomatik</span>
+                        <button class="btn-auto-calc" id="autoCalcBtn"><i class="fas fa-calculator me-1"></i> Otomatik Hesapla</button>
                         <button class="btn-edit-balance" id="editBalanceBtn"><i class="fas fa-pen me-1"></i> Düzenle</button>
                     </div>
                 </div>
@@ -590,8 +615,8 @@ Haklısınız, çok fazla deneme yaptık ve her şey karıştı. Şimdi en temel
     <!-- BAKİYE DÜZENLEME MODAL -->
     <div class="edit-balance-modal-overlay" id="editBalanceModal">
         <div class="edit-balance-modal-box">
-            <h6 class="mb-2"><i class="fas fa-pen me-2"></i> Nakit Bakiyeyi Ayarla</h6>
-            <p class="text-muted">Mevcut bakiye tamamen sıfırlanır ve yeni değer atanır.</p>
+            <h6 class="mb-2"><i class="fas fa-pen me-2"></i> Nakit Bakiyeyi Düzenle</h6>
+            <p class="info-text">Mevcut bakiyeyi manuel olarak değiştirin.</p>
             <div class="warning-text">
                 <i class="fas fa-exclamation-triangle me-1"></i>
                 Mevcut bakiye: <span id="currentBalanceDisplay">0,00</span> ₺
@@ -633,10 +658,11 @@ Haklısınız, çok fazla deneme yaptık ve her şey karıştı. Şimdi en temel
         const balanceRef = db.ref('nakitBakiye');
 
         // ============================================================
-        // BAKİYE - SADECE MANUEL
+        // BAKİYE
         // ============================================================
         let currentBalance = 0;
         let isManual = false;
+        let autoBalance = 0;
 
         const balanceAmountEl = document.getElementById('balanceAmount');
         const balanceModeEl = document.getElementById('balanceMode');
@@ -655,14 +681,33 @@ Haklısınız, çok fazla deneme yaptık ve her şey karıştı. Şimdi en temel
         }
 
         function refreshBalance() {
-            updateBalanceDisplay(currentBalance);
             if (isManual) {
+                updateBalanceDisplay(currentBalance);
                 balanceModeEl.textContent = '✏️ Manuel';
                 balanceInfoEl.textContent = `Bakiye: ${formatAmount(currentBalance)} ₺ (Manuel)`;
             } else {
+                updateBalanceDisplay(autoBalance);
                 balanceModeEl.textContent = '⚡ Otomatik';
-                balanceInfoEl.textContent = 'Otomatik hesaplanıyor...';
+                balanceInfoEl.textContent = `Otomatik hesaplanan: ${formatAmount(autoBalance)} ₺`;
             }
+        }
+
+        // Otomatik hesaplama
+        function calculateAutoBalance() {
+            let totalNakitGelir = 0;
+            salesData.forEach(item => {
+                if (item.odeme === 'Nakit') {
+                    totalNakitGelir += parseFloat(item.tutar) || 0;
+                }
+            });
+
+            let totalGider = 0;
+            expenseData.forEach(item => {
+                totalGider += parseFloat(item.tutar) || 0;
+            });
+
+            autoBalance = totalNakitGelir - totalGider;
+            return autoBalance;
         }
 
         // ============================================================
@@ -695,10 +740,10 @@ Haklısınız, çok fazla deneme yaptık ve her şey karıştı. Şimdi en temel
             balanceInfoEl.textContent = `Bakiye: ${formatAmount(val)} ₺ (Manuel)`;
             editBalanceModal.classList.remove('active');
 
-            // Firebase'e kaydet
             balanceRef.set({
                 balance: val,
                 isManual: true,
+                autoBalance: autoBalance,
                 updatedAt: firebase.database.ServerValue.TIMESTAMP
             });
             setSyncStatus('✅ Bakiye ' + formatAmount(val) + ' ₺ olarak ayarlandı', 'success');
@@ -706,6 +751,27 @@ Haklısınız, çok fazla deneme yaptık ve her şey karıştı. Şimdi en temel
 
         editBalanceModal.addEventListener('click', function(e) {
             if (e.target === this) this.classList.remove('active');
+        });
+
+        // ============================================================
+        // OTOMATİK HESAPLA BUTONU
+        // ============================================================
+        document.getElementById('autoCalcBtn').addEventListener('click', function() {
+            const calculated = calculateAutoBalance();
+            autoBalance = calculated;
+            isManual = false;
+            currentBalance = calculated;
+            updateBalanceDisplay(calculated);
+            balanceModeEl.textContent = '⚡ Otomatik';
+            balanceInfoEl.textContent = `Otomatik hesaplanan: ${formatAmount(calculated)} ₺`;
+
+            balanceRef.set({
+                balance: calculated,
+                isManual: false,
+                autoBalance: calculated,
+                updatedAt: firebase.database.ServerValue.TIMESTAMP
+            });
+            setSyncStatus('✅ Otomatik hesaplandı: ' + formatAmount(calculated) + ' ₺', 'success');
         });
 
         // ============================================================
@@ -1102,13 +1168,13 @@ Haklısınız, çok fazla deneme yaptık ve her şey karıştı. Şimdi en temel
             const wb = XLSX.utils.book_new();
 
             // Gelir sayfası
-            const salesData = [
+            const salesDataExcel = [
                 ['#', 'Müşteri', 'Ürün', 'Ödeme Türü', 'Havale Alan', 'Tutar (₺)', 'Tarih']
             ];
             salesRows.forEach(row => {
                 const cols = row.querySelectorAll('td');
                 if (cols.length >= 8) {
-                    salesData.push([
+                    salesDataExcel.push([
                         cols[0].textContent.trim(),
                         cols[1].textContent.trim(),
                         cols[2].textContent.trim(),
@@ -1119,17 +1185,17 @@ Haklısınız, çok fazla deneme yaptık ve her şey karıştı. Şimdi en temel
                     ]);
                 }
             });
-            const wsSales = XLSX.utils.aoa_to_sheet(salesData);
+            const wsSales = XLSX.utils.aoa_to_sheet(salesDataExcel);
             XLSX.utils.book_append_sheet(wb, wsSales, 'Gelir');
 
             // Gider sayfası
-            const expenseData = [
+            const expenseDataExcel = [
                 ['#', 'Kategori', 'Ürün/Hizmet', 'Alıcı', 'Tutar (₺)', 'Tarih', 'Not']
             ];
             expenseRows.forEach(row => {
                 const cols = row.querySelectorAll('td');
                 if (cols.length >= 8) {
-                    expenseData.push([
+                    expenseDataExcel.push([
                         cols[0].textContent.trim(),
                         cols[1].textContent.trim(),
                         cols[2].textContent.trim(),
@@ -1140,8 +1206,20 @@ Haklısınız, çok fazla deneme yaptık ve her şey karıştı. Şimdi en temel
                     ]);
                 }
             });
-            const wsExpense = XLSX.utils.aoa_to_sheet(expenseData);
+            const wsExpense = XLSX.utils.aoa_to_sheet(expenseDataExcel);
             XLSX.utils.book_append_sheet(wb, wsExpense, 'Gider');
+
+            // Özet sayfası
+            const summaryData = [
+                ['ÖZET'],
+                [''],
+                ['Nakit Bakiye', formatAmount(currentBalance)],
+                ['Bakiye Modu', isManual ? 'Manuel' : 'Otomatik'],
+                [''],
+                ['Toplam Nakit Gelir', formatAmount(calculateAutoBalance())]
+            ];
+            const wsSummary = XLSX.utils.aoa_to_sheet(summaryData);
+            XLSX.utils.book_append_sheet(wb, wsSummary, 'Özet');
 
             XLSX.writeFile(wb, `gelir_gider_${getToday()}.xlsx`);
             setSyncStatus('✅ Excel indirildi', 'success');
@@ -1159,6 +1237,9 @@ Haklısınız, çok fazla deneme yaptık ve her şey karıştı. Şimdi en temel
             if (data) {
                 currentBalance = data.balance || 0;
                 isManual = data.isManual || false;
+                if (data.autoBalance !== undefined) {
+                    autoBalance = data.autoBalance;
+                }
                 refreshBalance();
             }
         });
@@ -1166,18 +1247,18 @@ Haklısınız, çok fazla deneme yaptık ve her şey karıştı. Şimdi en temel
         refreshBalance();
         setSyncStatus('🔄 Yükleniyor...', 'syncing');
         console.log('✅ Uygulama başlatıldı!');
-        console.log('📌 Bakiye düzenle: Mevcut bakiye tamamen sıfırlanır, yeni değer atanır.');
+        console.log('📌 "Otomatik Hesapla" butonu ile sistem hesaplasın, isterseniz "Düzenle" ile manuel düzeltin.');
     </script>
 
 </body>
 </html>
 ```
 
-Temiz ve Çalışan Sürüm
+Otomatik ve Manuel Bakiye Yönetimi
 
-Tüm karmaşayı temizledim ve ihtiyacınız olan temel özellikleri içeren sade bir sürüm hazırladım.
+Artık bakiyenizi hem otomatik hesaplatıp hem de manuel olarak düzeltebilirsiniz.
 
-· Bakiye Yönetimi: "Düzenle" butonuna tıklayarak bakiyenizi sıfırdan ayarlayabilirsiniz. Mevcut bakiye ne olursa olsun, girdiğiniz değer doğrudan bakiyeniz olur. (Örn: 17.000 ₺ varken 150 ₺ girerseniz, bakiye 150 ₺ olur).
-· Gelir ve Gider Takibi: Gelir ve giderlerinizi ayrı sekmelerde listeleyebilir, ekleyebilir ve silebilirsiniz. Gelirlerde "Nakit" ve "Havale" seçenekleri mevcuttur.
-· Hazır Kalemler: "Yönetim" sekmesinden sık kullandığınız havale alacak kişileri ve gider kalemlerini ekleyip, gelir/gider formlarında tek tıkla kullanabilirsiniz.
-· Excel Dışa Aktarım: Tek bir butonla tüm gelir ve gider verilerinizi Excel dosyası olarak indirebilirsiniz.
+· Otomatik Hesapla Butonu: Bakiye kartındaki yeşil "Otomatik Hesapla" butonuna tıkladığınızda, sistem tüm nakit gelirleri toplar, tüm giderleri çıkarır ve size net bakiyeyi gösterir. Bu, en doğru hesaplamayı yapmanızı sağlar.
+· Manuel Düzenleme: "Düzenle" butonuna tıklayarak istediğiniz zaman bakiyeyi manuel olarak değiştirebilirsiniz. Örneğin, otomatik hesaplama yanlışsa veya kasadaki farklı bir tutarı girmek isterseniz bu özelliği kullanabilirsiniz.
+· Mod Göstergesi: Bakiye kartında "⚡ Otomatik" veya "✏️ Manuel" yazısı, bakiyenin nasıl hesaplandığını gösterir. Hangi modda olduğunuzu her zaman net bir şekilde görürsünüz.
+· Ana Bakiye: Bakiye kartında gösterilen değer, ana nakit bakiyenizdir. İster otomatik hesaplansın ister manuel girilsin, bu değer sizin gerçek bakiyeniz olarak kabul edilir.
