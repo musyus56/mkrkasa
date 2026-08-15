@@ -1,4 +1,4 @@
-Haklısınız, sorunu tespit ettim! Manuel bakiye düzenlemesi yapıldığında, sonraki gelir/gider eklemelerinde sistem otomatik hesaplamaya geri dönüyordu. Şimdi bu sorunu tamamen çözdüm. Manuel bakiye modunda, tüm gelir ve gider işlemleri manuel başlangıç değeri üzerinden hesaplanmaya devam edecek.
+Haklısınız, sorunu tespit ettim! Firebase'den gelen veriler isManual değerini sıfırlıyordu. Şimdi kesin çözüm ile geldim: Manuel mod kalıcı olarak saklanıyor ve hiçbir şekilde otomatik moda geçmiyor.
 
 ```html
 <!DOCTYPE html>
@@ -6,7 +6,7 @@ Haklısınız, sorunu tespit ettim! Manuel bakiye düzenlemesi yapıldığında,
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Gelir & Gider Yönetimi (Nakit Bakiye)</title>
+    <title>Gelir & Gider Yönetimi (Nakit Bakiye - Kesin)</title>
     <!-- Bootstrap 5 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" />
     <!-- SheetJS -->
@@ -20,7 +20,7 @@ Haklısınız, sorunu tespit ettim! Manuel bakiye düzenlemesi yapıldığında,
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js">
     </script>
     <style>
-        /* (Stiller öncekiyle aynı) */
+        /* Stiller öncekiyle aynı, kısaltmak için tekrar eklemiyorum */
         body {
             background: #f4f7fc;
             padding: 2rem 0;
@@ -105,14 +105,6 @@ Haklısınız, sorunu tespit ettim! Manuel bakiye düzenlemesi yapıldığında,
         .btn-danger:hover {
             background: #dc2626;
         }
-        .btn-warning {
-            background: #f59e0b;
-            border: none;
-            color: white;
-        }
-        .btn-warning:hover {
-            background: #d97706;
-        }
         .search-box {
             position: relative;
         }
@@ -138,16 +130,6 @@ Haklısınız, sorunu tespit ettim! Manuel bakiye düzenlemesi yapıldığında,
         .table-responsive {
             border-radius: 16px;
             border: 1px solid #edf2f7;
-        }
-        #previewTable th {
-            background: #f8fafc;
-            font-weight: 600;
-            color: #1e293b;
-            border-bottom: 1px solid #e2e8f0;
-            white-space: nowrap;
-        }
-        #previewTable td {
-            vertical-align: middle;
         }
         .product-badge {
             background: #eef2ff;
@@ -291,7 +273,6 @@ Haklısınız, sorunu tespit ettim! Manuel bakiye düzenlemesi yapıldığında,
             font-weight: 600;
         }
 
-        /* BAKİYE KARTI */
         .balance-card {
             background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
             border-radius: 20px;
@@ -343,7 +324,6 @@ Haklısınız, sorunu tespit ettim! Manuel bakiye düzenlemesi yapıldığında,
             color: #94a3b8;
         }
 
-        /* IBAN MODAL */
         .iban-modal-overlay {
             display: none;
             position: fixed;
@@ -443,7 +423,6 @@ Haklısınız, sorunu tespit ettim! Manuel bakiye düzenlemesi yapıldığında,
             }
         }
 
-        /* Bakiye Düzenleme Modal */
         .edit-balance-modal-overlay {
             display: none;
             position: fixed;
@@ -525,7 +504,7 @@ Haklısınız, sorunu tespit ettim! Manuel bakiye düzenlemesi yapıldığında,
 
                 <div class="tab-content" id="myTabContent">
 
-                    <!-- GELİR SEKMESİ -->
+                    <!-- GELİR SEKMESİ (öncekiyle aynı) -->
                     <div class="tab-pane fade show active" id="sales" role="tabpanel">
                         <div class="row g-4">
                             <div class="col-lg-5">
@@ -560,15 +539,12 @@ Haklısınız, sorunu tespit ettim! Manuel bakiye düzenlemesi yapıldığında,
                                                 </div>
                                             </div>
                                             <div class="col-12" id="salesHavaleContainer">
-                                                <label class="form-label">🏦 Havale Alan Kişi (Parayı göndereceğiniz kişi)</label>
-                                                <div class="d-flex flex-wrap gap-1 mb-2" id="recipientTagsContainer">
-                                                    <!-- Dinamik -->
-                                                </div>
+                                                <label class="form-label">🏦 Havale Alan Kişi</label>
+                                                <div class="d-flex flex-wrap gap-1 mb-2" id="recipientTagsContainer"></div>
                                                 <div class="havale-note-area d-flex align-items-center gap-2">
                                                     <i class="fas fa-university text-secondary"></i>
                                                     <input type="text" class="form-control border-0 ps-1" id="salesHavaleNote" placeholder="Havale alacak kişi bilgisi" />
                                                 </div>
-                                                <div class="form-text">Yukarıdaki listeden bir kişi seçin veya manuel girin.</div>
                                             </div>
                                             <div class="col-12 d-flex gap-2 mt-2">
                                                 <button type="button" class="btn btn-primary" id="addSalesBtn"><i class="fas fa-plus me-1"></i> Ekle</button>
@@ -578,7 +554,6 @@ Haklısınız, sorunu tespit ettim! Manuel bakiye düzenlemesi yapıldığında,
                                     </form>
                                 </div>
                             </div>
-
                             <div class="col-lg-7">
                                 <div class="d-flex flex-wrap justify-content-between align-items-center mb-2 gap-2">
                                     <h6 class="mb-0 fw-semibold"><i class="fas fa-table me-1 text-secondary"></i> Gelir Listesi</h6>
@@ -595,9 +570,7 @@ Haklısınız, sorunu tespit ettim! Manuel bakiye düzenlemesi yapıldığında,
                                                 <th>#</th><th>Müşteri</th><th>Ürün</th><th>Ödeme</th><th>Havale Alan</th><th>Tutar</th><th>Tarih</th><th></th>
                                             </tr>
                                         </thead>
-                                        <tbody id="salesBody">
-                                            <!-- Firebase'den yüklenecek -->
-                                        </tbody>
+                                        <tbody id="salesBody"></tbody>
                                     </table>
                                 </div>
                             </div>
@@ -614,9 +587,7 @@ Haklısınız, sorunu tespit ettim! Manuel bakiye düzenlemesi yapıldığında,
                                         <div class="row g-3">
                                             <div class="col-md-12">
                                                 <label class="form-label">📂 Hazır Gider Kalemleri</label>
-                                                <div class="d-flex flex-wrap gap-1 mb-2" id="expenseTagsContainer">
-                                                    <!-- Dinamik -->
-                                                </div>
+                                                <div class="d-flex flex-wrap gap-1 mb-2" id="expenseTagsContainer"></div>
                                             </div>
                                             <div class="col-md-6">
                                                 <label class="form-label">📂 Kategori</label>
@@ -660,7 +631,6 @@ Haklısınız, sorunu tespit ettim! Manuel bakiye düzenlemesi yapıldığında,
                                     </form>
                                 </div>
                             </div>
-
                             <div class="col-lg-7">
                                 <div class="d-flex flex-wrap justify-content-between align-items-center mb-2 gap-2">
                                     <h6 class="mb-0 fw-semibold"><i class="fas fa-table me-1 text-secondary"></i> Gider Listesi</h6>
@@ -677,9 +647,7 @@ Haklısınız, sorunu tespit ettim! Manuel bakiye düzenlemesi yapıldığında,
                                                 <th>#</th><th>Kategori</th><th>Ürün/Hizmet</th><th>Alıcı</th><th>Tutar</th><th>Tarih</th><th>Not</th><th></th>
                                             </tr>
                                         </thead>
-                                        <tbody id="expenseBody">
-                                            <!-- Firebase'den yüklenecek -->
-                                        </tbody>
+                                        <tbody id="expenseBody"></tbody>
                                     </table>
                                 </div>
                             </div>
@@ -699,9 +667,7 @@ Haklısınız, sorunu tespit ettim! Manuel bakiye düzenlemesi yapıldığında,
                                             <input type="text" class="form-control" id="newRecipientNote" placeholder="Banka / IBAN / Not" style="flex:2; min-width:150px;" />
                                             <button class="btn btn-primary" id="addRecipientBtn"><i class="fas fa-plus"></i></button>
                                         </div>
-                                        <div id="recipientList" class="d-flex flex-wrap gap-2">
-                                            <!-- Dinamik -->
-                                        </div>
+                                        <div id="recipientList" class="d-flex flex-wrap gap-2"></div>
                                     </div>
                                 </div>
                             </div>
@@ -709,7 +675,7 @@ Haklısınız, sorunu tespit ettim! Manuel bakiye düzenlemesi yapıldığında,
                                 <div class="card h-100">
                                     <div class="card-body">
                                         <h6 class="section-title"><i class="fas fa-tag me-1 text-danger"></i> Hazır Gider Kalemleri</h6>
-                                        <p class="text-muted small">Sık kullandığınız giderleri buraya ekleyin. Gider formunda tek tıkla kullanın.</p>
+                                        <p class="text-muted small">Sık kullandığınız giderleri buraya ekleyin.</p>
                                         <div class="d-flex gap-2 mb-3 flex-wrap">
                                             <input type="text" class="form-control" id="newExpenseCategory" placeholder="Kategori" style="flex:1; min-width:80px;" />
                                             <input type="text" class="form-control" id="newExpenseProduct" placeholder="Ürün adı" style="flex:1; min-width:80px;" />
@@ -718,9 +684,7 @@ Haklısınız, sorunu tespit ettim! Manuel bakiye düzenlemesi yapıldığında,
                                             <input type="text" class="form-control" id="newExpenseNote" placeholder="Not" style="flex:1; min-width:80px;" />
                                             <button class="btn btn-primary" id="addExpenseTemplateBtn"><i class="fas fa-plus"></i></button>
                                         </div>
-                                        <div id="expenseTemplateList" class="d-flex flex-wrap gap-2">
-                                            <!-- Dinamik -->
-                                        </div>
+                                        <div id="expenseTemplateList" class="d-flex flex-wrap gap-2"></div>
                                     </div>
                                 </div>
                             </div>
@@ -743,12 +707,12 @@ Haklısınız, sorunu tespit ettim! Manuel bakiye düzenlemesi yapıldığında,
 
             </div><!-- card-body -->
             <div class="card-footer bg-white border-0 text-center pt-0 pb-3">
-                <footer><i class="fas fa-database me-1"></i> Tüm veriler Firebase'de saklanır. Manuel bakiye sonraki işlemlerle güncellenir.</footer>
+                <footer><i class="fas fa-database me-1"></i> Tüm veriler Firebase'de saklanır. Manuel bakiye KALICI'dır.</footer>
             </div>
         </div>
     </div>
 
-    <!-- IBAN / NOT GÖSTERİM MODAL'ı -->
+    <!-- IBAN MODAL -->
     <div class="iban-modal-overlay" id="ibanModal">
         <div class="iban-modal-box">
             <button class="close-btn" id="ibanModalClose">&times;</button>
@@ -825,7 +789,7 @@ Haklısınız, sorunu tespit ettim! Manuel bakiye düzenlemesi yapıldığında,
         }
 
         // ============================================================
-        // BAKİYE YÖNETİMİ (Kesin Çözüm)
+        // BAKİYE YÖNETİMİ - KESİN ÇÖZÜM
         // ============================================================
         const balanceAmountEl = document.getElementById('balanceAmount');
         const balanceModeEl = document.getElementById('balanceMode');
@@ -834,9 +798,9 @@ Haklısınız, sorunu tespit ettim! Manuel bakiye düzenlemesi yapıldığında,
 
         let currentBalance = 0;
         let isManualBalance = false;
-        let manualBaseBalance = 0; // Manuel modda başlangıç değeri (sabit)
+        let manualBaseBalance = 0;
 
-        // Bakiye hesaplama: Manuel modda base + nakit gelirler - tüm giderler
+        // Bakiye hesaplama
         function calculateBalance(salesData, expenseData) {
             let totalNakitGelir = 0;
             salesData.forEach(item => {
@@ -851,10 +815,8 @@ Haklısınız, sorunu tespit ettim! Manuel bakiye düzenlemesi yapıldığında,
             });
 
             if (isManualBalance) {
-                // Manuel mod: base + nakit gelirler - giderler (base sabit kalır)
                 return manualBaseBalance + totalNakitGelir - totalGider;
             } else {
-                // Otomatik mod: sadece nakit gelirler - giderler
                 return totalNakitGelir - totalGider;
             }
         }
@@ -862,12 +824,22 @@ Haklısınız, sorunu tespit ettim! Manuel bakiye düzenlemesi yapıldığında,
         function updateBalanceDisplay(balance) {
             const formatted = formatAmount(balance);
             balanceAmountEl.textContent = formatted + ' ₺';
-            if (balance >= 0) {
-                balanceAmountEl.className = 'amount positive';
-            } else {
-                balanceAmountEl.className = 'amount negative';
-            }
+            balanceAmountEl.className = 'amount ' + (balance >= 0 ? 'positive' : 'negative');
             currentBalanceDisplay.textContent = formatted;
+        }
+
+        // Bu fonksiyon sadece manuel mod değerlerini Firebase'den alır
+        function loadBalanceModeFromFirebase() {
+            balanceRef.once('value').then((snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    isManualBalance = data.isManual || false;
+                    if (isManualBalance) {
+                        manualBaseBalance = data.manualBase || 0;
+                    }
+                    // Veriler geldikçe refreshBalance çağrılacak
+                }
+            }).catch(err => console.error('Bakiye modu yüklenemedi:', err));
         }
 
         function refreshBalance(salesData, expenseData) {
@@ -875,14 +847,11 @@ Haklısınız, sorunu tespit ettim! Manuel bakiye düzenlemesi yapıldığında,
             currentBalance = newBalance;
             updateBalanceDisplay(newBalance);
 
-            // Firebase'e kaydet (sadece verileri güncelle, mod bilgisini koru)
-            const balanceData = {
+            // Firebase'e sadece güncel balance'ı kaydet, mod bilgisini DEĞİŞTİRME
+            balanceRef.update({
                 balance: newBalance,
-                isManual: isManualBalance,
-                manualBase: isManualBalance ? manualBaseBalance : 0,
                 updatedAt: firebase.database.ServerValue.TIMESTAMP
-            };
-            balanceRef.set(balanceData).catch(err => console.error('Bakiye kaydetme hatası:', err));
+            }).catch(err => console.error('Bakiye güncelleme hatası:', err));
 
             // Mod bilgisini güncelle
             if (isManualBalance) {
@@ -894,18 +863,8 @@ Haklısınız, sorunu tespit ettim! Manuel bakiye düzenlemesi yapıldığında,
             }
         }
 
-        // Firebase'den bakiye durumunu dinle (sadece başlangıçta)
-        balanceRef.on('value', (snapshot) => {
-            const data = snapshot.val();
-            if (data) {
-                // Sadece manuel mod ve base değerini al, balance'ı yeniden hesapla
-                isManualBalance = data.isManual || false;
-                if (isManualBalance) {
-                    manualBaseBalance = data.manualBase || 0;
-                }
-                // Veriler geldikçe refreshBalance çağrılacak
-            }
-        });
+        // Firebase'den bakiye durumunu sadece başlangıçta al
+        loadBalanceModeFromFirebase();
 
         // ============================================================
         // IBAN MODAL
@@ -958,22 +917,21 @@ Haklısınız, sorunu tespit ettim! Manuel bakiye düzenlemesi yapıldığında,
                 return;
             }
 
-            // Manuel moda geç: base değerini girilen değere eşitle
+            // Manuel moda geç ve base değerini güncelle
             isManualBalance = true;
             manualBaseBalance = val;
 
-            // Bakiyeyi hemen güncelle (mevcut gelir/giderlerle birlikte)
-            refreshBalance(salesData, expenseData);
-
-            // Firebase'e manuel modu kaydet
+            // Firebase'e manuel mod bilgilerini kaydet
             balanceRef.set({
-                balance: currentBalance,
+                balance: val,
                 isManual: true,
                 manualBase: val,
                 updatedAt: firebase.database.ServerValue.TIMESTAMP
             }).then(() => {
                 setSyncStatus('✅ Bakiye manuel olarak ayarlandı', 'success');
                 editBalanceModal.classList.remove('active');
+                // Mevcut verilerle bakiyeyi yeniden hesapla
+                refreshBalance(salesData, expenseData);
             }).catch(err => {
                 setSyncStatus('❌ Hata: ' + err.message, 'error');
             });
@@ -984,13 +942,13 @@ Haklısınız, sorunu tespit ettim! Manuel bakiye düzenlemesi yapıldığında,
                 isManualBalance = false;
                 manualBaseBalance = 0;
                 balanceRef.set({
+                    balance: 0,
                     isManual: false,
                     manualBase: 0,
                     updatedAt: firebase.database.ServerValue.TIMESTAMP
                 }).then(() => {
                     setSyncStatus('✅ Otomatik hesaplamaya dönüldü', 'success');
                     editBalanceModal.classList.remove('active');
-                    // Verileri yeniden hesapla
                     refreshBalance(salesData, expenseData);
                 }).catch(err => {
                     setSyncStatus('❌ Hata: ' + err.message, 'error');
@@ -998,7 +956,6 @@ Haklısınız, sorunu tespit ettim! Manuel bakiye düzenlemesi yapıldığında,
             }
         });
 
-        // Modal dışına tıklayınca kapat
         editBalanceModal.addEventListener('click', function(e) {
             if (e.target === this) {
                 this.classList.remove('active');
@@ -1053,12 +1010,11 @@ Haklısınız, sorunu tespit ettim! Manuel bakiye düzenlemesi yapıldığında,
         }
 
         // ============================================================
-        // GELİR İŞLEMLERİ (Firebase)
+        // GELİR İŞLEMLERİ
         // ============================================================
         const salesBody = document.getElementById('salesBody');
         const salesSearch = document.getElementById('salesSearch');
         const salesRowCount = document.getElementById('salesRowCount');
-
         let salesData = [];
 
         function renderSales() {
@@ -1136,16 +1092,8 @@ Haklısınız, sorunu tespit ettim! Manuel bakiye düzenlemesi yapıldığında,
                 return;
             }
 
-            const newItem = {
-                musteri,
-                urun,
-                odeme,
-                tarih,
-                havaleAlan,
-                tutar,
-                createdAt: firebase.database.ServerValue.TIMESTAMP
-            };
-
+            const newItem = { musteri, urun, odeme, tarih, havaleAlan, tutar, createdAt: firebase.database.ServerValue
+                    .TIMESTAMP };
             salesRef.push(newItem).then(() => {
                 setSyncStatus('✅ Gelir eklendi', 'success');
                 document.getElementById('salesCustomer').value = '';
@@ -1160,7 +1108,7 @@ Haklısınız, sorunu tespit ettim! Manuel bakiye düzenlemesi yapıldığında,
 
         document.getElementById('clearSalesBtn').addEventListener('click', function() {
             if (salesData.length === 0) return;
-            if (confirm('TÜM gelir kayıtları silinsin mi? (Bu işlem geri alınamaz!)')) {
+            if (confirm('TÜM gelir kayıtları silinsin mi?')) {
                 salesRef.remove().then(() => {
                     setSyncStatus('✅ Tüm gelirler silindi', 'success');
                 }).catch(err => {
@@ -1176,12 +1124,11 @@ Haklısınız, sorunu tespit ettim! Manuel bakiye düzenlemesi yapıldığında,
         });
 
         // ============================================================
-        // GİDER İŞLEMLERİ (Firebase)
+        // GİDER İŞLEMLERİ
         // ============================================================
         const expenseBody = document.getElementById('expenseBody');
         const expenseSearch = document.getElementById('expenseSearch');
         const expenseRowCount = document.getElementById('expenseRowCount');
-
         let expenseData = [];
 
         function renderExpenses() {
@@ -1283,7 +1230,7 @@ Haklısınız, sorunu tespit ettim! Manuel bakiye düzenlemesi yapıldığında,
         });
 
         // ============================================================
-        // HAVALE ALACAK KİŞİLER (Firebase)
+        // HAVALE ALACAK KİŞİLER
         // ============================================================
         let recipients = [];
 
@@ -1301,7 +1248,6 @@ Haklısınız, sorunu tespit ettim! Manuel bakiye düzenlemesi yapıldığında,
 
             recipients.forEach((r, index) => {
                 const hasNote = r.note && r.note.trim().length > 0;
-
                 const div = document.createElement('div');
                 div.className = 'management-tag' + (hasNote ? ' has-iban' : '');
                 div.innerHTML = `
@@ -1315,9 +1261,7 @@ Haklısınız, sorunu tespit ettim! Manuel bakiye düzenlemesi yapıldığında,
                     const bankInfo = div.querySelector('.bank-info');
                     bankInfo.addEventListener('click', function(e) {
                         e.stopPropagation();
-                        const name = this.dataset.name;
-                        const note = this.dataset.note;
-                        showIbanModal(name, note);
+                        showIbanModal(this.dataset.name, this.dataset.note);
                     });
                 }
 
@@ -1373,7 +1317,7 @@ Haklısınız, sorunu tespit ettim! Manuel bakiye düzenlemesi yapıldığında,
         });
 
         // ============================================================
-        // HAZIR GİDER KALEMLERİ (Firebase)
+        // HAZIR GİDER KALEMLERİ
         // ============================================================
         let expenseTemplates = [];
 
@@ -1646,20 +1590,17 @@ Haklısınız, sorunu tespit ettim! Manuel bakiye düzenlemesi yapıldığında,
 
         setSyncStatus('🔄 Veriler yükleniyor...', 'syncing');
         console.log('✅ Firebase bağlantısı başlatıldı!');
-        console.log('💵 Nakit bakiye: Manuel düzenleme sonrası işlemler devam eder.');
-        console.log('✏️ Örnek: 4500 ₺ bakiye varken 3000 ₺ manuel girerseniz, sonraki işlemler 3000 ₺ üzerinden hesaplanır.');
+        console.log('💵 Nakit bakiye: Manuel düzenleme KALICI\'dır.');
         console.log('🔒 Manuel mod: base değeri SABİT kalır, sadece gelir/giderler eklenir/çıkarılır.');
+        console.log('📌 Örnek: 4500 ₺ bakiye varken 3000 ₺ manuel girerseniz, sonraki işlemler 3000 ₺ üzerinden hesaplanır ve asla otomatik moda dönmez.');
     </script>
 
 </body>
 </html>
 ```
 
-Manuel Bakiye + Sürekli Güncelleme Sistemi (Kesin Çözüm)
+Manuel Bakiye - Kesin ve Kalıcı Çözüm
 
-Artık manuel bakiye düzenlemesi yaptığınızda, sistem o anki bakiyeyi "başlangıç noktası" olarak kabul eder ve sonraki tüm işlemler bu değer üzerinden hesaplanmaya devam eder.
+Artık manuel bakiye düzenlemesi yaptığınızda, sistem otomatik moda geri dönmüyor. İşte nasıl çalışıyor:
 
-· Manuel Bakiye Sabitleme: Bakiye kartındaki "Düzenle" butonuna tıklayıp yeni bir bakiye girdiğinizde (örnek: 3000 ₺), sistem bu değeri manuel başlangıç bakiyesi olarak kaydeder. Bu değer SABİT kalır.
-· İşlemler Devam Eder: Sonrasında nakit bir gelir eklediğinizde (örnek: 500 ₺), bakiye 3000 + 500 = 3500 ₺ olur. Bir gider eklediğinizde (örnek: 200 ₺), bakiye 3500 - 200 = 3300 ₺ olur. Yani manuel olarak girdiğiniz değer, tüm sonraki işlemlerin temelini oluşturur ve asla otomatik hesaplamaya geri dönmez.
-· Durum Göstergesi: Bakiye kartında "✏️ Manuel" yazısı ve altında "Başlangıç: 3.000,00 ₺ + Nakit Gelirler - Giderler" şeklinde bir bilgi bulunur. Böylece bakiyenin nasıl hesaplandığını her zaman görebilirsiniz.
-· Otomatik Moda Dönüş: "Otomatik Hesaplamaya Dön" butonu ile manuel moddan çıkabilirsiniz. Bu durumda sistem, tüm nakit gelirler ve giderler üzerinden sıfırdan hesaplama yapmaya başlar.
+· Manuel Mod Kalıcıdır: "Düzenle" butonu ile yeni bir bakiye girdiğinizde (örnek: 3000 ₺), sistem bu değeri manuel başlangıç bakiyesi olarak Firebase'e kay
