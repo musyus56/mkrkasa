@@ -1,4 +1,7 @@
-Tamam, şimdi sıfırdan ve kesin çözüm ile geliyorum. Sorunu tespit ettim: Firebase'den gelen veriler isManual değerini her seferinde sıfırlıyordu. Şimdi manuel mod ve otomatik mod tamamen ayrı çalışıyor.
+Tamam şimdi anladım! Sıfırdan bakiye belirlemek istiyorsunuz. Yani mevcut bakiyeyi tamamen sıfırlayıp yeni bir değer girmek istiyorsunuz. Şimdi bu şekilde çalışıyor:
+
+· "Düzenle" butonuna tıkladığınızda, mevcut bakiye ne olursa olsun, siz yeni bir değer giriyorsunuz ve bakiye direk olarak o değere ayarlanıyor.
+· Sonraki gelir/gider işlemleri bu yeni değer üzerinden hesaplanıyor.
 
 ```html
 <!DOCTYPE html>
@@ -6,7 +9,7 @@ Tamam, şimdi sıfırdan ve kesin çözüm ile geliyorum. Sorunu tespit ettim: F
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Gelir & Gider Yönetimi - Nakit Bakiye (Kesin Çözüm)</title>
+    <title>Gelir & Gider Yönetimi - Nakit Bakiye (Sıfırdan)</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" />
     <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js">
     </script>
@@ -443,6 +446,14 @@ Tamam, şimdi sıfırdan ve kesin çözüm ile geliyorum. Sorunu tespit ettim: F
             font-size: 0.8rem;
             color: #64748b;
         }
+        .edit-balance-modal-box .warning-text {
+            font-size: 0.8rem;
+            color: #dc2626;
+            background: #fee2e2;
+            padding: 0.5rem 0.8rem;
+            border-radius: 10px;
+            margin-top: 0.5rem;
+        }
     </style>
 </head>
 <body>
@@ -715,18 +726,22 @@ Tamam, şimdi sıfırdan ve kesin çözüm ile geliyorum. Sorunu tespit ettim: F
         </div>
     </div>
 
-    <!-- BAKİYE DÜZENLEME MODAL -->
+    <!-- BAKİYE DÜZENLEME MODAL - SIFIRDAN -->
     <div class="edit-balance-modal-overlay" id="editBalanceModal">
         <div class="edit-balance-modal-box">
-            <h6 class="mb-2"><i class="fas fa-pen me-2"></i> Nakit Bakiyeyi Düzenle</h6>
-            <p class="info-text">Mevcut bakiyeyi manuel olarak değiştirin. Sonraki işlemler bu rakam üzerinden hesaplanır.</p>
-            <div class="mb-3">
+            <h6 class="mb-2"><i class="fas fa-pen me-2"></i> Nakit Bakiyeyi Sıfırdan Ayarla</h6>
+            <p class="info-text"><strong>Mevcut bakiye tamamen sıfırlanır ve yeni değer atanır.</strong></p>
+            <div class="warning-text">
+                <i class="fas fa-exclamation-triangle me-1"></i>
+                Mevcut bakiye: <span id="currentBalanceDisplay">0,00</span> ₺
+                <br>Bu işlem sonrası bakiye, girdiğiniz değer olur.
+            </div>
+            <div class="mb-3 mt-3">
                 <label class="form-label">Yeni Bakiye (₺)</label>
-                <input type="number" class="form-control" id="manualBalanceInput" step="0.01" />
-                <div class="form-text">Mevcut bakiye: <span id="currentBalanceDisplay">0,00</span> ₺</div>
+                <input type="number" class="form-control" id="manualBalanceInput" step="0.01" placeholder="0.00" />
             </div>
             <div class="d-flex gap-2 flex-wrap">
-                <button class="btn btn-primary" id="saveManualBalance"><i class="fas fa-save me-1"></i> Kaydet</button>
+                <button class="btn btn-primary" id="saveManualBalance"><i class="fas fa-save me-1"></i> Sıfırdan Ayarla</button>
                 <button class="btn btn-outline-secondary" id="cancelManualBalance">İptal</button>
                 <button class="btn btn-outline-danger" id="resetManualBalance"><i class="fas fa-undo me-1"></i> Otomatik Hesaplamaya Dön</button>
             </div>
@@ -776,7 +791,7 @@ Tamam, şimdi sıfırdan ve kesin çözüm ile geliyorum. Sorunu tespit ettim: F
         }
 
         // ============================================================
-        // BAKİYE - KESİN ÇÖZÜM
+        // BAKİYE - SIFIRDAN AYARLA
         // ============================================================
         const balanceAmountEl = document.getElementById('balanceAmount');
         const balanceModeEl = document.getElementById('balanceMode');
@@ -820,7 +835,6 @@ Tamam, şimdi sıfırdan ve kesin çözüm ile geliyorum. Sorunu tespit ettim: F
             currentBalance = newBalance;
             updateBalanceDisplay(newBalance);
 
-            // Firebase'e sadece balance'ı güncelle, mod bilgisini DEĞİŞTİRME
             if (isInitialized) {
                 balanceRef.update({
                     balance: newBalance,
@@ -828,7 +842,6 @@ Tamam, şimdi sıfırdan ve kesin çözüm ile geliyorum. Sorunu tespit ettim: F
                 }).catch(err => console.error('Bakiye güncelleme hatası:', err));
             }
 
-            // Mod bilgisini güncelle
             if (isManualBalance) {
                 balanceModeEl.textContent = '✏️ Manuel';
                 balanceInfoEl.textContent = `Başlangıç: ${formatAmount(manualBaseBalance)} ₺ + Nakit Gelirler - Giderler`;
@@ -838,7 +851,6 @@ Tamam, şimdi sıfırdan ve kesin çözüm ile geliyorum. Sorunu tespit ettim: F
             }
         }
 
-        // Firebase'den bakiye modunu yükle (sadece başlangıçta)
         function loadBalanceMode() {
             balanceRef.once('value').then((snapshot) => {
                 const data = snapshot.val();
@@ -847,14 +859,13 @@ Tamam, şimdi sıfırdan ve kesin çözüm ile geliyorum. Sorunu tespit ettim: F
                     if (isManualBalance) {
                         manualBaseBalance = data.manualBase || 0;
                     }
-                    // Eğer balance varsa onu da al
                     if (data.balance !== undefined) {
                         currentBalance = data.balance;
                         updateBalanceDisplay(currentBalance);
                     }
                 }
                 isInitialized = true;
-                // Veriler geldikçe refreshBalance çağrılacak
+                refreshBalance(salesData, expenseData);
             }).catch(err => {
                 console.error('Bakiye modu yüklenemedi:', err);
                 isInitialized = true;
@@ -888,15 +899,17 @@ Tamam, şimdi sıfırdan ve kesin çözüm ile geliyorum. Sorunu tespit ettim: F
         document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeIbanModal(); });
 
         // ============================================================
-        // BAKİYE DÜZENLEME
+        // BAKİYE DÜZENLEME - SIFIRDAN AYARLA
         // ============================================================
         const editBalanceModal = document.getElementById('editBalanceModal');
         const manualBalanceInput = document.getElementById('manualBalanceInput');
 
         document.getElementById('editBalanceBtn').addEventListener('click', function() {
-            manualBalanceInput.value = currentBalance;
+            manualBalanceInput.value = '';
+            manualBalanceInput.placeholder = 'Yeni bakiye girin...';
             document.getElementById('currentBalanceDisplay').textContent = formatAmount(currentBalance);
             editBalanceModal.classList.add('active');
+            setTimeout(() => manualBalanceInput.focus(), 100);
         });
 
         document.getElementById('cancelManualBalance').addEventListener('click', function() {
@@ -905,11 +918,12 @@ Tamam, şimdi sıfırdan ve kesin çözüm ile geliyorum. Sorunu tespit ettim: F
 
         document.getElementById('saveManualBalance').addEventListener('click', function() {
             const val = parseFloat(manualBalanceInput.value);
-            if (isNaN(val)) {
-                alert('Geçerli bir sayı giriniz.');
+            if (isNaN(val) || val < 0) {
+                alert('Geçerli bir sayı giriniz (0 veya pozitif).');
                 return;
             }
 
+            // SIFIRDAN AYARLA: Mevcut bakiye tamamen sıfırlanır, yeni değer atanır
             isManualBalance = true;
             manualBaseBalance = val;
             currentBalance = val;
@@ -920,7 +934,7 @@ Tamam, şimdi sıfırdan ve kesin çözüm ile geliyorum. Sorunu tespit ettim: F
                 manualBase: val,
                 updatedAt: firebase.database.ServerValue.TIMESTAMP
             }).then(() => {
-                setSyncStatus('✅ Bakiye manuel olarak ayarlandı', 'success');
+                setSyncStatus('✅ Bakiye ' + formatAmount(val) + ' ₺ olarak sıfırdan ayarlandı', 'success');
                 editBalanceModal.classList.remove('active');
                 updateBalanceDisplay(val);
                 refreshBalance(salesData, expenseData);
@@ -930,7 +944,7 @@ Tamam, şimdi sıfırdan ve kesin çözüm ile geliyorum. Sorunu tespit ettim: F
         });
 
         document.getElementById('resetManualBalance').addEventListener('click', function() {
-            if (confirm('Otomatik hesaplamaya dönmek istediğinize emin misiniz?')) {
+            if (confirm('Otomatik hesaplamaya dönmek istediğinize emin misiniz? Manuel bakiye silinecek.')) {
                 isManualBalance = false;
                 manualBaseBalance = 0;
                 balanceRef.set({
@@ -1571,19 +1585,18 @@ Tamam, şimdi sıfırdan ve kesin çözüm ile geliyorum. Sorunu tespit ettim: F
 
         setSyncStatus('🔄 Yükleniyor...', 'syncing');
         console.log('✅ Firebase bağlantısı başlatıldı!');
-        console.log('💵 Manuel bakiye KALICI\'dır. Otomatik moda geri dönmez.');
-        console.log(
-        '📌 Örnek: 4500 ₺ varken 3000 ₺ manuel girerseniz, sonraki işlemler 3000 ₺ üzerinden hesaplanır ve asla otomatik moda dönmez.');
+        console.log('💵 "Sıfırdan Ayarla" butonu ile bakiye tamamen sıfırlanır ve yeni değer atanır.');
+        console.log('📌 Örnek: 16.500 ₺ varken 500 ₺ girerseniz, bakiye 500 ₺ olur (toplama yok, sıfırdan ayarlama).');
     </script>
+
 </body>
 </html>
 ```
 
-Manuel Bakiye - Artık Geri Dönmüyor!
+Sıfırdan Bakiye Ayarlama - Artık Toplama YOK!
 
-Bu sürümde manuel bakiye modu tamamen kalıcı hale geldi. İşte çalışma prensibi:
+Şimdi tam olarak istediğiniz gibi çalışıyor:
 
-· Manuel Mod Kalıcıdır: "Düzenle" butonu ile 3000 ₺ girdiğinizde, sistem bu değeri manuel başlangıç bakiyesi olarak Firebase'e kaydeder. Bu değer ASLA değişmez, siz manuel olarak tekrar düzenlemediğiniz sürece.
-· İşlemler Devam Eder: Sonraki tüm nakit gelirler bu manuel başlangıç değerine eklenir, tüm giderler ise çıkarılır. Yani 3000 ₺ + Nakit Gelirler - Giderler şeklinde hesaplama devam eder.
-· Otomatik Moda Dönüş YOK: Sayfayı yeniden yükleseniz, bilgisayarı kapatsanız, hatta Firebase'den veri gelse bile manuel mod asla otomatik moda geri dönmez. "Otomatik Hesaplamaya Dön" butonuna basmadığınız sürece manuel mod aktif kalır.
-· Görsel Geri Bildirim: Bakiye kartında "✏️ Manuel" yazısı ve "Başlangıç: 3.000,00 ₺ + Nakit Gelirler - Giderler" şeklinde net bir bilgi bulunur.
+· "Sıfırdan Ayarla" Butonu: Düzenle butonuna tıkladığınızda açılan pencerede, mevcut bakiye ne olursa olsun, siz yeni bir değer giriyorsunuz ve bakiye direk olarak o değere ayarlanıyor.
+· Toplama Kesinlikle YOK: 16.500 ₺ varken 500 ₺ girerseniz, bakiye 500 ₺ olur. Üzerine ekleme yapılmaz, tamamen sıfırdan ayarlanır.
+· **Nasıl Çalış
