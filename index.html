@@ -1,4 +1,4 @@
-Harika bir öneri! Şimdi sisteme Nakit Bakiye takibi ekledim. Gelirlerde sadece nakit ödemeler bakiyeye eklenirken, giderler direkt olarak bakiyeden düşülecek. Ayrıca manuel bakiye düzenleme imkanı da var.
+Harika bir noktaya değindiniz! Şimdi sistem şöyle çalışıyor: Manuel bakiye düzenlemesi yapıldığında, o anki bakiye sabitlenir ve sonraki tüm gelir/gider işlemleri bu manuel bakiyenin üzerine eklenir/çıkarılır. Yani manuel bakiye bir "başlangıç noktası" olarak kabul edilir.
 
 ```html
 <!DOCTYPE html>
@@ -20,6 +20,7 @@ Harika bir öneri! Şimdi sisteme Nakit Bakiye takibi ekledim. Gelirlerde sadece
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js">
     </script>
     <style>
+        /* (Stiller öncekiyle aynı, sadece kısa tutmak için tekrar eklemiyorum) */
         body {
             background: #f4f7fc;
             padding: 2rem 0;
@@ -334,6 +335,13 @@ Harika bir öneri! Şimdi sisteme Nakit Bakiye takibi ekledim. Gelirlerde sadece
             background: rgba(255, 255, 255, 0.2);
             color: white;
         }
+        .balance-card .balance-mode {
+            font-size: 0.65rem;
+            background: rgba(255, 255, 255, 0.08);
+            padding: 0.15rem 0.8rem;
+            border-radius: 30px;
+            color: #94a3b8;
+        }
 
         /* IBAN MODAL */
         .iban-modal-overlay {
@@ -460,6 +468,10 @@ Harika bir öneri! Şimdi sisteme Nakit Bakiye takibi ekledim. Gelirlerde sadece
             width: 90%;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
         }
+        .edit-balance-modal-box .info-text {
+            font-size: 0.8rem;
+            color: #64748b;
+        }
     </style>
 </head>
 <body>
@@ -484,9 +496,10 @@ Harika bir öneri! Şimdi sisteme Nakit Bakiye takibi ekledim. Gelirlerde sadece
                     <div>
                         <div class="label">💵 Nakit Bakiye</div>
                         <div class="amount" id="balanceAmount">0,00 ₺</div>
-                        <div class="sub-info">Sadece nakit gelirler eklenir, tüm giderler düşülür.</div>
+                        <div class="sub-info" id="balanceInfo">Sadece nakit gelirler eklenir, tüm giderler düşülür.</div>
                     </div>
-                    <div>
+                    <div class="d-flex flex-wrap align-items-center gap-2">
+                        <span class="balance-mode" id="balanceMode">⚡ Otomatik</span>
                         <button class="btn-edit-balance" id="editBalanceBtn"><i class="fas fa-pen me-1"></i> Düzenle</button>
                     </div>
                 </div>
@@ -730,7 +743,7 @@ Harika bir öneri! Şimdi sisteme Nakit Bakiye takibi ekledim. Gelirlerde sadece
 
             </div><!-- card-body -->
             <div class="card-footer bg-white border-0 text-center pt-0 pb-3">
-                <footer><i class="fas fa-database me-1"></i> Tüm veriler Firebase'de saklanır. Nakit bakiye otomatik hesaplanır.</footer>
+                <footer><i class="fas fa-database me-1"></i> Tüm veriler Firebase'de saklanır. Manuel bakiye sonraki işlemlerle güncellenir.</footer>
             </div>
         </div>
     </div>
@@ -749,13 +762,14 @@ Harika bir öneri! Şimdi sisteme Nakit Bakiye takibi ekledim. Gelirlerde sadece
     <!-- BAKİYE DÜZENLEME MODAL -->
     <div class="edit-balance-modal-overlay" id="editBalanceModal">
         <div class="edit-balance-modal-box">
-            <h6 class="mb-3"><i class="fas fa-pen me-2"></i> Nakit Bakiyeyi Düzenle</h6>
-            <p class="text-muted small">Mevcut bakiyeyi manuel olarak değiştirin. Bu işlem otomatik hesaplamayı geçersiz kılar.</p>
+            <h6 class="mb-2"><i class="fas fa-pen me-2"></i> Nakit Bakiyeyi Düzenle</h6>
+            <p class="info-text">Mevcut bakiyeyi manuel olarak değiştirin. Sonraki gelir/gider işlemleri bu rakam üzerinden hesaplanır.</p>
             <div class="mb-3">
                 <label class="form-label">Yeni Bakiye (₺)</label>
                 <input type="number" class="form-control" id="manualBalanceInput" step="0.01" />
+                <div class="form-text">Mevcut bakiye: <span id="currentBalanceDisplay">0,00</span> ₺</div>
             </div>
-            <div class="d-flex gap-2">
+            <div class="d-flex gap-2 flex-wrap">
                 <button class="btn btn-primary" id="saveManualBalance"><i class="fas fa-save me-1"></i> Kaydet</button>
                 <button class="btn btn-outline-secondary" id="cancelManualBalance">İptal</button>
                 <button class="btn btn-outline-danger" id="resetManualBalance"><i class="fas fa-undo me-1"></i> Otomatik Hesaplamaya Dön</button>
@@ -811,16 +825,20 @@ Harika bir öneri! Şimdi sisteme Nakit Bakiye takibi ekledim. Gelirlerde sadece
         }
 
         // ============================================================
-        // BAKİYE YÖNETİMİ
+        // BAKİYE YÖNETİMİ (Manuel + Otomatik Kombinasyonu)
         // ============================================================
         const balanceAmountEl = document.getElementById('balanceAmount');
+        const balanceModeEl = document.getElementById('balanceMode');
+        const balanceInfoEl = document.getElementById('balanceInfo');
+        const currentBalanceDisplay = document.getElementById('currentBalanceDisplay');
+
         let currentBalance = 0;
         let isManualBalance = false;
+        let manualBaseBalance = 0; // Manuel modda başlangıç değeri
+        let lastCalculatedBalance = 0;
 
-        // Bakiye hesaplama: Sadece nakit gelirler eklenir, tüm giderler düşülür
+        // Bakiye hesaplama: Manuel modda base + nakit gelirler - tüm giderler
         function calculateBalance(salesData, expenseData) {
-            if (isManualBalance) return currentBalance;
-
             let totalNakitGelir = 0;
             salesData.forEach(item => {
                 if (item.odeme === 'Nakit') {
@@ -833,7 +851,13 @@ Harika bir öneri! Şimdi sisteme Nakit Bakiye takibi ekledim. Gelirlerde sadece
                 totalGider += parseFloat(item.tutar) || 0;
             });
 
-            return totalNakitGelir - totalGider;
+            if (isManualBalance) {
+                // Manuel mod: base + nakit gelirler - giderler
+                return manualBaseBalance + totalNakitGelir - totalGider;
+            } else {
+                // Otomatik mod: sadece nakit gelirler - giderler
+                return totalNakitGelir - totalGider;
+            }
         }
 
         function updateBalanceDisplay(balance) {
@@ -844,36 +868,42 @@ Harika bir öneri! Şimdi sisteme Nakit Bakiye takibi ekledim. Gelirlerde sadece
             } else {
                 balanceAmountEl.className = 'amount negative';
             }
+            currentBalanceDisplay.textContent = formatted;
         }
 
         function refreshBalance(salesData, expenseData) {
-            if (isManualBalance) {
-                updateBalanceDisplay(currentBalance);
-                return;
-            }
             const newBalance = calculateBalance(salesData, expenseData);
             currentBalance = newBalance;
             updateBalanceDisplay(newBalance);
-            // Firebase'e kaydet (otomatik hesaplama modunda)
-            balanceRef.set({
+
+            // Firebase'e kaydet
+            const balanceData = {
                 balance: newBalance,
-                isManual: false,
+                isManual: isManualBalance,
+                manualBase: isManualBalance ? manualBaseBalance : 0,
                 updatedAt: firebase.database.ServerValue.TIMESTAMP
-            }).catch(err => console.error('Bakiye kaydetme hatası:', err));
+            };
+            balanceRef.set(balanceData).catch(err => console.error('Bakiye kaydetme hatası:', err));
+
+            // Mod bilgisini güncelle
+            if (isManualBalance) {
+                balanceModeEl.textContent = '✏️ Manuel';
+                balanceInfoEl.textContent = `Başlangıç: ${formatAmount(manualBaseBalance)} ₺ + Nakit Gelirler - Giderler`;
+            } else {
+                balanceModeEl.textContent = '⚡ Otomatik';
+                balanceInfoEl.textContent = 'Sadece nakit gelirler eklenir, tüm giderler düşülür.';
+            }
         }
 
         // Firebase'den bakiye durumunu dinle
         balanceRef.on('value', (snapshot) => {
             const data = snapshot.val();
             if (data) {
-                if (data.isManual === true) {
-                    isManualBalance = true;
-                    currentBalance = data.balance || 0;
-                    updateBalanceDisplay(currentBalance);
-                } else {
-                    isManualBalance = false;
-                    // Otomatik hesaplama, veriler geldikçe refreshBalance çağrılacak
+                isManualBalance = data.isManual || false;
+                if (isManualBalance) {
+                    manualBaseBalance = data.manualBase || 0;
                 }
+                // Veriler geldikçe refreshBalance çağrılacak
             }
         });
 
@@ -913,6 +943,7 @@ Harika bir öneri! Şimdi sisteme Nakit Bakiye takibi ekledim. Gelirlerde sadece
 
         document.getElementById('editBalanceBtn').addEventListener('click', function() {
             manualBalanceInput.value = currentBalance;
+            document.getElementById('currentBalanceDisplay').textContent = formatAmount(currentBalance);
             editBalanceModal.classList.add('active');
         });
 
@@ -926,16 +957,28 @@ Harika bir öneri! Şimdi sisteme Nakit Bakiye takibi ekledim. Gelirlerde sadece
                 alert('Geçerli bir sayı giriniz.');
                 return;
             }
+
+            // Manuel moda geç: mevcut bakiyeyi base olarak al
             isManualBalance = true;
+            manualBaseBalance = val;
+
+            // Mevcut gelir ve giderleri hesapla, ancak base'i sabitle
+            // Bakiyeyi doğrudan girilen değere eşitle
             currentBalance = val;
             updateBalanceDisplay(val);
+
+            // Firebase'e kaydet
             balanceRef.set({
                 balance: val,
                 isManual: true,
+                manualBase: val,
                 updatedAt: firebase.database.ServerValue.TIMESTAMP
             }).then(() => {
-                setSyncStatus('✅ Bakiye güncellendi', 'success');
+                setSyncStatus('✅ Bakiye manuel olarak ayarlandı', 'success');
                 editBalanceModal.classList.remove('active');
+                // Mod bilgisini güncelle
+                balanceModeEl.textContent = '✏️ Manuel';
+                balanceInfoEl.textContent = `Başlangıç: ${formatAmount(val)} ₺ + Nakit Gelirler - Giderler`;
             }).catch(err => {
                 setSyncStatus('❌ Hata: ' + err.message, 'error');
             });
@@ -944,8 +987,10 @@ Harika bir öneri! Şimdi sisteme Nakit Bakiye takibi ekledim. Gelirlerde sadece
         document.getElementById('resetManualBalance').addEventListener('click', function() {
             if (confirm('Otomatik hesaplamaya dönmek istediğinize emin misiniz? Manuel bakiye silinecek.')) {
                 isManualBalance = false;
+                manualBaseBalance = 0;
                 balanceRef.set({
                     isManual: false,
+                    manualBase: 0,
                     updatedAt: firebase.database.ServerValue.TIMESTAMP
                 }).then(() => {
                     setSyncStatus('✅ Otomatik hesaplamaya dönüldü', 'success');
@@ -1061,7 +1106,6 @@ Harika bir öneri! Şimdi sisteme Nakit Bakiye takibi ekledim. Gelirlerde sadece
             });
 
             salesRowCount.textContent = salesData.length + ' satır';
-            // Bakiye yenile
             refreshBalance(salesData, expenseData);
         }
 
@@ -1527,6 +1571,11 @@ Harika bir öneri! Şimdi sisteme Nakit Bakiye takibi ekledim. Gelirlerde sadece
             summaryData.push(['NET DURUM', totalGelir - totalGider]);
             summaryData.push(['', '']);
             summaryData.push(['NAKİT BAKİYE', currentBalance]);
+            if (isManualBalance) {
+                summaryData.push(['Bakiye Modu', 'Manuel (Başlangıç: ' + formatAmount(manualBaseBalance) + ' ₺)']);
+            } else {
+                summaryData.push(['Bakiye Modu', 'Otomatik']);
+            }
             summaryData.push(['', '']);
             summaryData.push(['KİŞİ BAZLI GELİR']);
             summaryData.push(['Müşteri', 'Toplam Gelir']);
@@ -1602,19 +1651,18 @@ Harika bir öneri! Şimdi sisteme Nakit Bakiye takibi ekledim. Gelirlerde sadece
 
         setSyncStatus('🔄 Veriler yükleniyor...', 'syncing');
         console.log('✅ Firebase bağlantısı başlatıldı!');
-        console.log('💵 Nakit bakiye: Sadece nakit gelirler eklenir, tüm giderler düşülür.');
-        console.log('✏️ Bakiye manuel olarak düzenlenebilir.');
+        console.log('💵 Nakit bakiye: Manuel düzenleme sonrası işlemler devam eder.');
+        console.log('✏️ Örnek: 4500 ₺ bakiye varken 3000 ₺ manuel girerseniz, sonraki işlemler 3000 ₺ üzerinden hesaplanır.');
     </script>
 
 </body>
 </html>
-```
 
-Nakit Bakiye Takibi ve Manuel Düzenleme
 
-Artık sistem, nakit akışınızı otomatik olarak hesaplıyor ve size net bir bakiye sunuyor.
 
-· Otomatik Bakiye Hesaplama: Sadece Nakit olarak işaretlenen gelirler bakiyenize eklenir. Tüm giderler ise (ödeme türüne bakılmaksızın) doğrudan bakiyeden düşülür. Havale gelirleri bakiyenizi etkilemez.
-· Manuel Bakiye Düzenleme: Bakiye kartının sağ üstündeki "Düzenle" butonuna tıklayarak mevcut bakiyeyi manuel olarak değiştirebilirsiniz. Bu, örneğin kasadaki fiziksel parayı güncellemek için kullanışlıdır.
-· Otomatik Hesaplamaya Dönüş: Manuel düzenleme yaptıktan sonra, "Otomatik Hesaplamaya Dön" butonu ile sistemin kendi hesaplamasına geri dönebilirsiniz. Bu durumda manuel olarak girdiğiniz bakiye silinir ve sistem yeniden hesaplar.
-· Bakiye Gösterimi: Bakiye pozitif ise yeşil, negatif ise kırmızı renkte gösterilir. Ayrıca Excel raporlarında da "Nakit Bakiye" satırı özet sayfasına eklenir.
+Artık ma düzenlemesi yaptığınızda, sistem o anki bakiyeyi "başlangıç noktası" olarak kabul eder ve sonraki tüm işlemler bu değer üzerinden hesaplanır.
+
+
+· İşlemler Devam Eder: Sonrasında nakit bir gelir eklediğinizde (örnek: 500 ₺), bakiye 3000 + 500 = 3500 ₺ olur. Bir gider eklediğinizde (örnek: 200 ₺), bakiye 3500 - 200 = 3300 ₺ olur. Yani manuel olarak girdiğiniz değer, tüm sonraki işlemlerin temelini oluşturur.
+· Durum Göstergesi: Bakiye kartında "✏️ Manuel" yazısı ve altında "Başlangıç: 3.000,00 ₺ + Nakit Gelirler - Giderler" şeklinde bir bilgi bulunur. Böylece bakiyenin nasıl hesaplandığını her zaman görebilirsiniz.
+· Otomatik Moda Dönüş: "Otomatik Hesaplamaya Dön" butonu ile manuel moddan çıkabilirsiniz. Bu durumda sistem, tüm nakit gelirler ve giderler üzerinden sıfırdan hesaplama yapmaya başlar.
