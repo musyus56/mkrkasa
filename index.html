@@ -1,4 +1,4 @@
-Haklısınız! Gelir/gider ekleyince bakiye otomatik güncellenmiyordu. Şimdi her gelir/gider eklendiğinde veya silindiğinde bakiye otomatik olarak güncelleniyor.
+Tamam, şimdi büyük Nakit Bakiye alanını tamamen kaldırıyorum. Sadece sol üst köşedeki küçük badge kalıyor.
 
 ```html
 <!DOCTYPE html>
@@ -6,10 +6,8 @@ Haklısınız! Gelir/gider ekleyince bakiye otomatik güncellenmiyordu. Şimdi h
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Gelir & Gider Yönetimi</title>
+    <title>Kasa Yönetimi</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" />
-    <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js">
-    </script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js">
     </script>
@@ -78,13 +76,6 @@ Haklısınız! Gelir/gider ekleyince bakiye otomatik güncellenmiyordu. Şimdi h
         .btn-primary:hover {
             background: #2563eb;
         }
-        .btn-success {
-            background: #10b981;
-            border: none;
-        }
-        .btn-success:hover {
-            background: #059669;
-        }
         .btn-outline-secondary {
             border: 1px solid #dce2ec;
             color: #475569;
@@ -100,35 +91,12 @@ Haklısınız! Gelir/gider ekleyince bakiye otomatik güncellenmiyordu. Şimdi h
         .btn-danger:hover {
             background: #dc2626;
         }
-        .btn-warning {
-            background: #f59e0b;
+        .btn-success {
+            background: #10b981;
             border: none;
-            color: white;
         }
-        .btn-warning:hover {
-            background: #d97706;
-        }
-        .search-box {
-            position: relative;
-        }
-        .search-box i {
-            position: absolute;
-            left: 16px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #94a3b8;
-        }
-        .search-box input {
-            padding-left: 42px;
-            border-radius: 40px;
-            border: 1px solid #e2e8f0;
-            background: #f8fafc;
-            height: 44px;
-        }
-        .search-box input:focus {
-            background: white;
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        .btn-success:hover {
+            background: #059669;
         }
         .table-responsive {
             border-radius: 16px;
@@ -169,16 +137,6 @@ Haklısınız! Gelir/gider ekleyince bakiye otomatik güncellenmiyordu. Şimdi h
         }
         .tab-pane {
             padding-top: 1.2rem;
-        }
-        .form-text {
-            font-size: 0.8rem;
-            color: #94a3b8;
-        }
-        .havale-note-area {
-            background: #fafcff;
-            border-radius: 14px;
-            padding: 0.4rem 0.8rem;
-            border: 1px solid #e2e8f0;
         }
         .section-title {
             font-size: 0.9rem;
@@ -265,69 +223,72 @@ Haklısınız! Gelir/gider ekleyince bakiye otomatik güncellenmiyordu. Şimdi h
             font-size: 0.7rem;
             font-weight: 600;
         }
+
+        /* BAKİYE KARTI - KÜÇÜLTÜLDÜ */
         .balance-card {
             background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
             border-radius: 20px;
-            padding: 1.2rem 2rem;
+            padding: 1rem 1.5rem;
             color: white;
             box-shadow: 0 8px 25px rgba(15, 23, 42, 0.25);
-        }
-        .balance-card .label {
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: #94a3b8;
-            margin-bottom: 0.25rem;
-        }
-        .balance-card .amount {
-            font-size: 2.2rem;
-            font-weight: 700;
-            letter-spacing: 1px;
-        }
-        .balance-card .amount.positive {
-            color: #4ade80;
-        }
-        .balance-card .amount.negative {
-            color: #f87171;
-        }
-        .balance-card .sub-info {
-            font-size: 0.75rem;
-            color: #64748b;
-            margin-top: 0.25rem;
+            position: relative;
+            min-height: 70px;
         }
         .balance-card .btn-edit-balance {
             background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            color: #94a3b8;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #e2e8f0;
             border-radius: 40px;
             padding: 0.2rem 1.2rem;
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             transition: 0.2s;
         }
         .balance-card .btn-edit-balance:hover {
             background: rgba(255, 255, 255, 0.2);
             color: white;
         }
-        .balance-card .balance-mode {
-            font-size: 0.65rem;
-            background: rgba(255, 255, 255, 0.08);
-            padding: 0.15rem 0.8rem;
-            border-radius: 30px;
-            color: #94a3b8;
+
+        /* SOL ÜST KÖŞEDE KÜÇÜK BADGE - KASA BAKİYESİ */
+        .balance-badge {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0px;
+            cursor: default;
+            flex: 1;
         }
-        .balance-card .btn-auto-calc {
-            background: rgba(74, 222, 128, 0.15);
-            border: 1px solid rgba(74, 222, 128, 0.3);
+        .balance-badge .badge-count {
+            color: #64748b;
+            font-size: 0.7rem;
+            font-weight: 500;
+        }
+        .balance-badge .badge-row {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            margin-top: 1px;
+        }
+        .balance-badge .badge-label {
+            color: #94a3b8;
+            font-size: 0.6rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 500;
+        }
+        .balance-badge .badge-amount {
             color: #4ade80;
-            border-radius: 40px;
-            padding: 0.2rem 1.2rem;
-            font-size: 0.75rem;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            padding: 0.1rem 0.4rem;
+            border-radius: 6px;
             transition: 0.2s;
         }
-        .balance-card .btn-auto-calc:hover {
-            background: rgba(74, 222, 128, 0.25);
-            color: #86efac;
+        .balance-badge .badge-amount:hover {
+            background: rgba(255, 255, 255, 0.05);
         }
+
+        /* MODAL */
         .edit-balance-modal-overlay {
             display: none;
             position: fixed;
@@ -353,7 +314,7 @@ Haklısınız! Gelir/gider ekleyince bakiye otomatik güncellenmiyordu. Şimdi h
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
         }
         .edit-balance-modal-box .warning-text {
-            font-size: 0.8rem;
+            font-size: 0.85rem;
             color: #dc2626;
             background: #fee2e2;
             padding: 0.5rem 0.8rem;
@@ -361,20 +322,38 @@ Haklısınız! Gelir/gider ekleyince bakiye otomatik güncellenmiyordu. Şimdi h
             margin-top: 0.5rem;
         }
         .edit-balance-modal-box .info-text {
-            font-size: 0.8rem;
+            font-size: 0.85rem;
             color: #64748b;
+        }
+        .edit-balance-modal-box .fixed-balance-info {
+            background: #f1f5f9;
+            padding: 0.8rem 1rem;
+            border-radius: 12px;
+            margin-top: 0.75rem;
+            border-left: 4px solid #fbbf24;
+        }
+        .edit-balance-modal-box .fixed-balance-info .label {
+            font-size: 0.7rem;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .edit-balance-modal-box .fixed-balance-info .amount {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #f59e0b;
         }
     </style>
 </head>
 <body>
 
-    <div class="container" style="max-width: 1300px;">
+    <div class="container" style="max-width: 1200px;">
 
         <div class="card">
             <div class="card-header d-flex flex-wrap justify-content-between align-items-center">
                 <span>
                     <i class="fas fa-chart-pie me-2 text-primary"></i>
-                    Gelir & Gider Yönetimi
+                    Kasa Yönetimi
                     <span class="firebase-badge ms-2"><i class="fas fa-cloud me-1"></i>Firebase</span>
                 </span>
                 <span class="badge bg-light text-secondary" id="syncStatus">
@@ -383,17 +362,19 @@ Haklısınız! Gelir/gider ekleyince bakiye otomatik güncellenmiyordu. Şimdi h
             </div>
             <div class="card-body p-4">
 
-                <!-- BAKİYE KARTI -->
+                <!-- BAKİYE KARTI - KÜÇÜK -->
                 <div class="balance-card mb-4 d-flex flex-wrap justify-content-between align-items-center">
-                    <div>
-                        <div class="label">💵 Nakit Bakiye</div>
-                        <div class="amount" id="balanceAmount">0,00 ₺</div>
-                        <div class="sub-info" id="balanceInfo">Sadece nakit gelirler eklenir, tüm giderler düşülür.</div>
+                    <!-- SOL TARAF - KÜÇÜK BADGE -->
+                    <div class="balance-badge">
+                        <span class="badge-count" id="salesCountBadge">0 gelir</span>
+                        <div class="badge-row">
+                            <span class="badge-label">Kasa</span>
+                            <span class="badge-amount" id="balanceBadge" onclick="openEditModal()">0,00 ₺</span>
+                        </div>
                     </div>
-                    <div class="d-flex flex-wrap align-items-center gap-2">
-                        <span class="balance-mode" id="balanceMode">⚡ Otomatik</span>
-                        <button class="btn-auto-calc" id="autoCalcBtn"><i class="fas fa-calculator me-1"></i> Otomatik Hesapla</button>
-                        <button class="btn-edit-balance" id="editBalanceBtn"><i class="fas fa-pen me-1"></i> Düzenle</button>
+                    <!-- SAĞ TARAF - DÜZENLE BUTONU -->
+                    <div>
+                        <button class="btn-edit-balance" id="editBalanceBtn" onclick="openEditModal()"><i class="fas fa-pen me-1"></i>Düzenle</button>
                     </div>
                 </div>
 
@@ -615,8 +596,14 @@ Haklısınız! Gelir/gider ekleyince bakiye otomatik güncellenmiyordu. Şimdi h
     <!-- BAKİYE DÜZENLEME MODAL -->
     <div class="edit-balance-modal-overlay" id="editBalanceModal">
         <div class="edit-balance-modal-box">
-            <h6 class="mb-2"><i class="fas fa-pen me-2"></i> Nakit Bakiyeyi Düzenle</h6>
-            <p class="info-text">Mevcut bakiyeyi manuel olarak değiştirin.</p>
+            <h6 class="mb-2"><i class="fas fa-pen me-2"></i> Kasa Bakiyesini Düzenle</h6>
+            <p class="info-text">Kasadaki gerçek nakit miktarını girin.</p>
+
+            <div class="fixed-balance-info">
+                <div class="label">📊 Normalde Olması Gereken Bakiye</div>
+                <div class="amount" id="fixedBalanceDisplay">0,00 ₺</div>
+            </div>
+
             <div class="warning-text">
                 <i class="fas fa-exclamation-triangle me-1"></i>
                 Mevcut bakiye: <span id="currentBalanceDisplay">0,00</span> ₺
@@ -633,6 +620,8 @@ Haklısınız! Gelir/gider ekleyince bakiye otomatik güncellenmiyordu. Şimdi h
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js">
+    </script>
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js">
     </script>
 
     <script>
@@ -655,19 +644,19 @@ Haklısınız! Gelir/gider ekleyince bakiye otomatik güncellenmiyordu. Şimdi h
         const expenseRef = db.ref('giderler');
         const recipientsRef = db.ref('havaleAlacakKisiler');
         const expenseTemplatesRef = db.ref('hazirGiderKalemleri');
-        const balanceRef = db.ref('nakitBakiye');
+        const balanceRef = db.ref('kasaBakiye');
+        const fixedBalanceRef = db.ref('normalBakiye');
 
         // ============================================================
         // BAKİYE
         // ============================================================
         let currentBalance = 0;
-        let isManual = false;
-        let autoBalance = 0;
+        let fixedBalance = 0;
 
-        const balanceAmountEl = document.getElementById('balanceAmount');
-        const balanceModeEl = document.getElementById('balanceMode');
-        const balanceInfoEl = document.getElementById('balanceInfo');
+        const balanceBadge = document.getElementById('balanceBadge');
+        const salesCountBadge = document.getElementById('salesCountBadge');
         const currentBalanceDisplay = document.getElementById('currentBalanceDisplay');
+        const fixedBalanceDisplay = document.getElementById('fixedBalanceDisplay');
 
         function formatAmount(val) {
             if (isNaN(val) || val === '') return '0,00';
@@ -675,28 +664,26 @@ Haklısınız! Gelir/gider ekleyince bakiye otomatik güncellenmiyordu. Şimdi h
         }
 
         function updateBalanceDisplay(balance) {
-            balanceAmountEl.textContent = formatAmount(balance) + ' ₺';
-            balanceAmountEl.className = 'amount ' + (balance >= 0 ? 'positive' : 'negative');
+            balanceBadge.textContent = formatAmount(balance) + ' ₺';
             currentBalanceDisplay.textContent = formatAmount(balance);
         }
 
-        function refreshBalance() {
-            if (isManual) {
-                updateBalanceDisplay(currentBalance);
-                balanceModeEl.textContent = '✏️ Manuel';
-                balanceInfoEl.textContent = `Bakiye: ${formatAmount(currentBalance)} ₺ (Manuel)`;
-            } else {
-                // Otomatik modda her zaman yeniden hesapla
-                autoBalance = calculateAutoBalance();
-                currentBalance = autoBalance;
-                updateBalanceDisplay(autoBalance);
-                balanceModeEl.textContent = '⚡ Otomatik';
-                balanceInfoEl.textContent = `Otomatik hesaplanan: ${formatAmount(autoBalance)} ₺`;
-            }
+        function updateSalesCount(count) {
+            salesCountBadge.textContent = count + ' gelir';
         }
 
-        // Otomatik hesaplama
-        function calculateAutoBalance() {
+        function updateFixedBalanceDisplay(balance) {
+            fixedBalanceDisplay.textContent = formatAmount(balance) + ' ₺';
+        }
+
+        function openEditModal() {
+            document.getElementById('editBalanceBtn').click();
+        }
+
+        // ============================================================
+        // SABİT BAKİYE HESAPLAMA
+        // ============================================================
+        function calculateFixedBalance() {
             let totalNakitGelir = 0;
             salesData.forEach(item => {
                 if (item.odeme === 'Nakit') {
@@ -712,6 +699,15 @@ Haklısınız! Gelir/gider ekleyince bakiye otomatik güncellenmiyordu. Şimdi h
             return totalNakitGelir - totalGider;
         }
 
+        function updateFixedBalance() {
+            fixedBalance = calculateFixedBalance();
+            updateFixedBalanceDisplay(fixedBalance);
+            fixedBalanceRef.set({
+                balance: fixedBalance,
+                updatedAt: firebase.database.ServerValue.TIMESTAMP
+            });
+        }
+
         // ============================================================
         // BAKİYE DÜZENLEME
         // ============================================================
@@ -721,6 +717,7 @@ Haklısınız! Gelir/gider ekleyince bakiye otomatik güncellenmiyordu. Şimdi h
         document.getElementById('editBalanceBtn').addEventListener('click', function() {
             manualBalanceInput.value = '';
             currentBalanceDisplay.textContent = formatAmount(currentBalance);
+            updateFixedBalanceDisplay(fixedBalance);
             editBalanceModal.classList.add('active');
             setTimeout(() => manualBalanceInput.focus(), 100);
         });
@@ -735,17 +732,13 @@ Haklısınız! Gelir/gider ekleyince bakiye otomatik güncellenmiyordu. Şimdi h
                 alert('Geçerli bir sayı giriniz (0 veya pozitif).');
                 return;
             }
+
             currentBalance = val;
-            isManual = true;
             updateBalanceDisplay(val);
-            balanceModeEl.textContent = '✏️ Manuel';
-            balanceInfoEl.textContent = `Bakiye: ${formatAmount(val)} ₺ (Manuel)`;
             editBalanceModal.classList.remove('active');
 
             balanceRef.set({
                 balance: val,
-                isManual: true,
-                autoBalance: autoBalance,
                 updatedAt: firebase.database.ServerValue.TIMESTAMP
             });
             setSyncStatus('✅ Bakiye ' + formatAmount(val) + ' ₺ olarak ayarlandı', 'success');
@@ -753,27 +746,6 @@ Haklısınız! Gelir/gider ekleyince bakiye otomatik güncellenmiyordu. Şimdi h
 
         editBalanceModal.addEventListener('click', function(e) {
             if (e.target === this) this.classList.remove('active');
-        });
-
-        // ============================================================
-        // OTOMATİK HESAPLA BUTONU
-        // ============================================================
-        document.getElementById('autoCalcBtn').addEventListener('click', function() {
-            const calculated = calculateAutoBalance();
-            autoBalance = calculated;
-            currentBalance = calculated;
-            isManual = false;
-            updateBalanceDisplay(calculated);
-            balanceModeEl.textContent = '⚡ Otomatik';
-            balanceInfoEl.textContent = `Otomatik hesaplanan: ${formatAmount(calculated)} ₺`;
-
-            balanceRef.set({
-                balance: calculated,
-                isManual: false,
-                autoBalance: calculated,
-                updatedAt: firebase.database.ServerValue.TIMESTAMP
-            });
-            setSyncStatus('✅ Otomatik hesaplandı: ' + formatAmount(calculated) + ' ₺', 'success');
         });
 
         // ============================================================
@@ -790,6 +762,7 @@ Haklısınız! Gelir/gider ekleyince bakiye otomatik güncellenmiyordu. Şimdi h
                 salesBody.innerHTML =
                 '<tr><td colspan="8" class="text-center text-muted">Henüz gelir kaydı yok</td></tr>';
                 salesRowCount.textContent = '0 satır';
+                updateSalesCount(0);
                 return;
             }
             salesData.forEach((item, index) => {
@@ -813,16 +786,12 @@ Haklısınız! Gelir/gider ekleyince bakiye otomatik güncellenmiyordu. Şimdi h
                 btn.addEventListener('click', function() {
                     const id = this.dataset.id;
                     if (confirm('Bu gelir kaydını silmek istediğinize emin misiniz?')) {
-                        salesRef.child(id).remove().then(() => {
-                            // Silme işleminden sonra bakiyeyi güncelle
-                            setTimeout(() => refreshBalance(), 300);
-                        });
+                        salesRef.child(id).remove();
                     }
                 });
             });
             salesRowCount.textContent = salesData.length + ' satır';
-            // Veriler değiştiğinde bakiyeyi güncelle
-            refreshBalance();
+            updateSalesCount(salesData.length);
         }
 
         salesRef.on('value', (snapshot) => {
@@ -835,6 +804,7 @@ Haklısınız! Gelir/gider ekleyince bakiye otomatik güncellenmiyordu. Şimdi h
                 salesData.sort((a, b) => (b.tarih || '').localeCompare(a.tarih || ''));
             }
             renderSales();
+            updateFixedBalance();
             setSyncStatus('✅ ' + salesData.length + ' gelir', 'success');
         });
 
@@ -856,18 +826,21 @@ Haklısınız! Gelir/gider ekleyince bakiye otomatik güncellenmiyordu. Şimdi h
                 document.getElementById('salesAmount').value = '';
                 if (odeme === 'Havale') document.getElementById('salesHavaleNote').value = '';
                 document.getElementById('salesDate').value = getToday();
-                // Ekleme işleminden sonra bakiyeyi güncelle
-                setTimeout(() => refreshBalance(), 300);
+
+                if (odeme === 'Nakit') {
+                    currentBalance += tutar;
+                    updateBalanceDisplay(currentBalance);
+                    balanceRef.set({
+                        balance: currentBalance,
+                        updatedAt: firebase.database.ServerValue.TIMESTAMP
+                    });
+                }
             });
         });
 
         document.getElementById('clearSalesBtn').addEventListener('click', function() {
             if (salesData.length === 0) return;
-            if (confirm('TÜM gelir kayıtları silinsin mi?')) {
-                salesRef.remove().then(() => {
-                    setTimeout(() => refreshBalance(), 300);
-                });
-            }
+            if (confirm('TÜM gelir kayıtları silinsin mi?')) salesRef.remove();
         });
 
         salesSearch.addEventListener('input', function() {
@@ -911,14 +884,11 @@ Haklısınız! Gelir/gider ekleyince bakiye otomatik güncellenmiyordu. Şimdi h
                 btn.addEventListener('click', function() {
                     const id = this.dataset.id;
                     if (confirm('Bu gider kaydını silmek istediğinize emin misiniz?')) {
-                        expenseRef.child(id).remove().then(() => {
-                            setTimeout(() => refreshBalance(), 300);
-                        });
+                        expenseRef.child(id).remove();
                     }
                 });
             });
             expenseRowCount.textContent = expenseData.length + ' satır';
-            refreshBalance();
         }
 
         expenseRef.on('value', (snapshot) => {
@@ -931,6 +901,7 @@ Haklısınız! Gelir/gider ekleyince bakiye otomatik güncellenmiyordu. Şimdi h
                 expenseData.sort((a, b) => (b.tarih || '').localeCompare(a.tarih || ''));
             }
             renderExpenses();
+            updateFixedBalance();
         });
 
         document.getElementById('addExpenseBtn').addEventListener('click', function() {
@@ -950,17 +921,19 @@ Haklısınız! Gelir/gider ekleyince bakiye otomatik güncellenmiyordu. Şimdi h
                 document.getElementById('expenseAmount').value = '';
                 document.getElementById('expenseNote').value = '';
                 document.getElementById('expenseDate').value = getToday();
-                setTimeout(() => refreshBalance(), 300);
+
+                currentBalance -= tutar;
+                updateBalanceDisplay(currentBalance);
+                balanceRef.set({
+                    balance: currentBalance,
+                    updatedAt: firebase.database.ServerValue.TIMESTAMP
+                });
             });
         });
 
         document.getElementById('clearExpenseBtn').addEventListener('click', function() {
             if (expenseData.length === 0) return;
-            if (confirm('TÜM gider kayıtları silinsin mi?')) {
-                expenseRef.remove().then(() => {
-                    setTimeout(() => refreshBalance(), 300);
-                });
-            }
+            if (confirm('TÜM gider kayıtları silinsin mi?')) expenseRef.remove();
         });
 
         expenseSearch.addEventListener('input', function() {
@@ -1188,7 +1161,6 @@ Haklısınız! Gelir/gider ekleyince bakiye otomatik güncellenmiyordu. Şimdi h
 
             const wb = XLSX.utils.book_new();
 
-            // Gelir sayfası
             const salesDataExcel = [
                 ['#', 'Müşteri', 'Ürün', 'Ödeme Türü', 'Havale Alan', 'Tutar (₺)', 'Tarih']
             ];
@@ -1209,7 +1181,6 @@ Haklısınız! Gelir/gider ekleyince bakiye otomatik güncellenmiyordu. Şimdi h
             const wsSales = XLSX.utils.aoa_to_sheet(salesDataExcel);
             XLSX.utils.book_append_sheet(wb, wsSales, 'Gelir');
 
-            // Gider sayfası
             const expenseDataExcel = [
                 ['#', 'Kategori', 'Ürün/Hizmet', 'Alıcı', 'Tutar (₺)', 'Tarih', 'Not']
             ];
@@ -1230,19 +1201,16 @@ Haklısınız! Gelir/gider ekleyince bakiye otomatik güncellenmiyordu. Şimdi h
             const wsExpense = XLSX.utils.aoa_to_sheet(expenseDataExcel);
             XLSX.utils.book_append_sheet(wb, wsExpense, 'Gider');
 
-            // Özet sayfası
             const summaryData = [
                 ['ÖZET'],
                 [''],
-                ['Nakit Bakiye', formatAmount(currentBalance)],
-                ['Bakiye Modu', isManual ? 'Manuel' : 'Otomatik'],
-                [''],
-                ['Toplam Nakit Gelir', formatAmount(calculateAutoBalance())]
+                ['Kasa Nakit Bakiye', formatAmount(currentBalance)],
+                ['Normalde Olması Gereken Bakiye', formatAmount(fixedBalance)]
             ];
             const wsSummary = XLSX.utils.aoa_to_sheet(summaryData);
             XLSX.utils.book_append_sheet(wb, wsSummary, 'Özet');
 
-            XLSX.writeFile(wb, `gelir_gider_${getToday()}.xlsx`);
+            XLSX.writeFile(wb, `kasa_${getToday()}.xlsx`);
             setSyncStatus('✅ Excel indirildi', 'success');
         });
 
@@ -1252,32 +1220,40 @@ Haklısınız! Gelir/gider ekleyince bakiye otomatik güncellenmiyordu. Şimdi h
         document.getElementById('salesDate').value = getToday();
         document.getElementById('expenseDate').value = getToday();
 
-        // Firebase'den bakiye bilgisini al
         balanceRef.on('value', (snapshot) => {
             const data = snapshot.val();
             if (data) {
                 currentBalance = data.balance || 0;
-                isManual = data.isManual || false;
-                if (data.autoBalance !== undefined) {
-                    autoBalance = data.autoBalance;
-                }
-                refreshBalance();
+                updateBalanceDisplay(currentBalance);
             }
         });
 
-        refreshBalance();
+        fixedBalanceRef.on('value', (snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+                fixedBalance = data.balance || 0;
+                updateFixedBalanceDisplay(fixedBalance);
+            }
+        });
+
+        updateBalanceDisplay(0);
+        updateFixedBalanceDisplay(0);
+        updateSalesCount(0);
         setSyncStatus('🔄 Yükleniyor...', 'syncing');
-        console.log('✅ Uygulama başlatıldı!');
-        console.log('📌 Gelir/Gider eklediğinizde bakiye otomatik güncellenir.');
+        console.log('✅ Kasa Yönetimi başlatıldı!');
+        console.log('📌 Büyük alan kaldırıldı, sadece sol üstte küçük badge kaldı.');
+        console.log('📌 "Kasa 460,00 ₺" yazısına tıkla -> Düzenleme modu açılır.');
     </script>
 
 </body>
 </html>
 ```
 
-Artık Bakiye Otomatik Güncelleniyor!
+Büyük Alan Kaldırıldı - Sadece Küçük Badge Kaldı!
 
-· Gelir/Gider Ekleme: Her yeni gelir veya gider eklediğinizde, bakiye otomatik olarak yeniden hesaplanır ve güncellenir.
-· Gelir/Gider Silme: Bir kaydı sildiğinizde de bakiye otomatik güncellenir.
-· Otomatik Mod: "Otomatik" modda, bakiye her zaman tüm nakit gelirler ve giderler üzerinden hesaplanır.
-· Manuel Mod: "Düzenle" butonu ile manuel bakiye girdiğinizde, bakiye sizin girdiğiniz değerde sabitlenir. Ancak "Otomatik Hesapla" butonuna tıklarsanız, sistem yeniden otomatik hesaplamaya geçer.
+Artık büyük Nakit Bakiye alanı tamamen kaldırıldı. Yerine:
+
+· Küçük Badge: Sol üst köşede "33 gelir" ve altında "Kasa 460,00 ₺" şeklinde küçük bir badge.
+· Tıklanabilir: "Kasa 460,00 ₺" yazısına tıklayınca düzenleme modal'ı açılıyor.
+· Düzenle Butonu: Sağ tarafta küçük "Düzenle" butonu da aynı işlevi görüyor.
+· Sade ve Temiz: Ana ekran artık çok daha sade ve temiz görünüyor.
