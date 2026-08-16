@@ -261,27 +261,26 @@
         }
 
         /* ============================================================
-           KÜÇÜK BAKİYE SAYACI
+           SAĞ ÜST BAKİYE SAYACI
            ============================================================ */
 
         .balance-counter {
             position: fixed;
             top: 15px;
-            left: 15px;
+            right: 15px;
+            left: auto;
 
             z-index: 9999;
 
             display: flex;
             align-items: center;
             justify-content: center;
-
             gap: 8px;
 
             background: #0f172a;
             color: #4ade80;
 
             padding: 8px 18px;
-
             min-height: 40px;
 
             border-radius: 40px;
@@ -313,13 +312,12 @@
         }
 
         @media (max-width: 576px) {
-
             .balance-counter {
                 top: 10px;
-                left: 10px;
+                right: 10px;
+                left: auto;
 
                 padding: 8px 15px;
-
                 min-height: 40px;
 
                 font-size: 0.9rem;
@@ -338,7 +336,6 @@
             display: none;
 
             position: fixed;
-
             top: 0;
             left: 0;
 
@@ -346,10 +343,9 @@
             height: 100%;
 
             background: rgba(0, 0, 0, 0.5);
-
             backdrop-filter: blur(3px);
 
-            z-index: 9998;
+            z-index: 10000;
 
             justify-content: center;
             align-items: center;
@@ -367,7 +363,6 @@
             border-radius: 20px;
 
             max-width: 450px;
-
             width: 90%;
 
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
@@ -375,7 +370,6 @@
 
         .edit-balance-modal-box .warning-text {
             font-size: 0.85rem;
-
             color: #dc2626;
 
             background: #fee2e2;
@@ -406,19 +400,15 @@
 
         .edit-balance-modal-box .fixed-balance-info .label {
             font-size: 0.7rem;
-
             color: #64748b;
 
             text-transform: uppercase;
-
             letter-spacing: 1px;
         }
 
         .edit-balance-modal-box .fixed-balance-info .amount {
             font-size: 1.4rem;
-
             font-weight: 700;
-
             color: #f59e0b;
         }
     </style>
@@ -427,11 +417,13 @@
 <body>
 
     <!-- ============================================================
-         KÜÇÜK BAKİYE SAYACI
+         SAĞ ÜST BAKİYE SAYACI
+         TIKLANINCA DÜZENLEME MENÜSÜ AÇILIR
          ============================================================ -->
 
     <div
         class="balance-counter"
+        id="balanceCounter"
         onclick="openEditModal()"
         title="Bakiyeyi düzenle">
 
@@ -451,28 +443,21 @@
             <div class="card-header d-flex flex-wrap justify-content-between align-items-center">
 
                 <span>
-
                     <i class="fas fa-chart-pie me-2 text-primary"></i>
 
                     Kasa Yönetimi
 
                     <span class="firebase-badge ms-2">
-
                         <i class="fas fa-cloud me-1"></i>
-
                         Firebase
-
                     </span>
-
                 </span>
-
 
                 <span
                     class="badge bg-light text-secondary"
                     id="syncStatus">
 
                     <i class="fas fa-sync me-1"></i>
-
                     Senkronize
 
                 </span>
@@ -482,22 +467,9 @@
 
             <div class="card-body p-4">
 
-                <!--
-                    Gizli buton.
-                    Mevcut JavaScript yapısının çalışması için
-                    korunuyor.
-                -->
-
-                <button
-                    type="button"
-                    id="editBalanceBtn"
-                    style="display:none;">
-                </button>
-
-
-                <!-- ==================================================
+                <!-- ====================================================
                      SEKME MENÜSÜ
-                     ================================================== -->
+                     ==================================================== -->
 
                 <ul
                     class="nav nav-pills mb-3"
@@ -601,7 +573,6 @@
                                     <form id="salesForm">
 
                                         <div class="row g-3">
-
 
                                             <div class="col-md-12">
 
@@ -796,7 +767,6 @@
                                         <thead>
 
                                             <tr>
-
                                                 <th>#</th>
                                                 <th>Müşteri</th>
                                                 <th>Ürün</th>
@@ -805,7 +775,6 @@
                                                 <th>Tutar</th>
                                                 <th>Tarih</th>
                                                 <th></th>
-
                                             </tr>
 
                                         </thead>
@@ -851,7 +820,6 @@
                                     <form id="expenseForm">
 
                                         <div class="row g-3">
-
 
                                             <div class="col-md-12">
 
@@ -1071,7 +1039,6 @@
                                         <thead>
 
                                             <tr>
-
                                                 <th>#</th>
                                                 <th>Kategori</th>
                                                 <th>Ürün/Hizmet</th>
@@ -1080,7 +1047,6 @@
                                                 <th>Tarih</th>
                                                 <th>Not</th>
                                                 <th></th>
-
                                             </tr>
 
                                         </thead>
@@ -1109,7 +1075,6 @@
                         role="tabpanel">
 
                         <div class="row g-4">
-
 
                             <div class="col-md-6">
 
@@ -1289,7 +1254,7 @@
 
 
     <!-- ================================================================
-         BAKİYE DÜZENLEME MODAL
+         BAKİYE DÜZENLEME MODALI
          ================================================================ -->
 
     <div
@@ -1405,57 +1370,35 @@
         // ============================================================
 
         const firebaseConfig = {
-
-            apiKey:
-                "AIzaSyAyDVAK9r-1YJmlDHoatdqyS49Lm7-19as",
-
-            authDomain:
-                "mkrgelirgider.firebaseapp.com",
-
-            databaseURL:
-                "https://mkrgelirgider-default-rtdb.firebaseio.com",
-
-            projectId:
-                "mkrgelirgider",
-
-            storageBucket:
-                "mkrgelirgider.firebasestorage.app",
-
-            messagingSenderId:
-                "775659718508",
-
-            appId:
-                "1:775659718508:web:cf9b8ae7b72c3148af9549"
-
+            apiKey: "AIzaSyAyDVAK9r-1YJmlDHoatdqyS49Lm7-19as",
+            authDomain: "mkrgelirgider.firebaseapp.com",
+            databaseURL: "https://mkrgelirgider-default-rtdb.firebaseio.com",
+            projectId: "mkrgelirgider",
+            storageBucket: "mkrgelirgider.firebasestorage.app",
+            messagingSenderId: "775659718508",
+            appId: "1:775659718508:web:cf9b8ae7b72c3148af9549"
         };
 
 
         firebase.initializeApp(firebaseConfig);
 
-
-        const db =
-            firebase.database();
+        const db = firebase.database();
 
 
         const salesRef =
             db.ref('gelirler');
 
-
         const expenseRef =
             db.ref('giderler');
-
 
         const recipientsRef =
             db.ref('havaleAlacakKisiler');
 
-
         const expenseTemplatesRef =
             db.ref('hazirGiderKalemleri');
 
-
         const balanceRef =
             db.ref('kasaBakiye');
-
 
         const fixedBalanceRef =
             db.ref('normalBakiye');
@@ -1466,69 +1409,79 @@
         // ============================================================
 
         let currentBalance = 0;
-
         let fixedBalance = 0;
 
 
         const balanceBadge =
             document.getElementById('balanceBadge');
 
-
         const currentBalanceDisplay =
-            document.getElementById(
-                'currentBalanceDisplay'
-            );
-
+            document.getElementById('currentBalanceDisplay');
 
         const fixedBalanceDisplay =
-            document.getElementById(
-                'fixedBalanceDisplay'
-            );
+            document.getElementById('fixedBalanceDisplay');
 
 
         function formatAmount(val) {
 
-            if (
-                isNaN(val) ||
-                val === ''
-            ) {
-
+            if (isNaN(val) || val === '') {
                 return '0,00';
-
             }
 
-
-            return parseFloat(val)
-                .toLocaleString(
-                    'tr-TR',
-                    {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2
-                    }
-                );
-
+            return parseFloat(val).toLocaleString(
+                'tr-TR',
+                {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                }
+            );
         }
 
 
         function updateBalanceDisplay(balance) {
 
             balanceBadge.textContent =
-                formatAmount(balance) +
-                ' ₺';
-
+                formatAmount(balance) + ' ₺';
 
             currentBalanceDisplay.textContent =
                 formatAmount(balance);
-
         }
 
 
+        function updateFixedBalanceDisplay(balance) {
+
+            fixedBalanceDisplay.textContent =
+                formatAmount(balance) + ' ₺';
+        }
+
+
+        // ============================================================
+        // DÜZENLEME MENÜSÜ
+        // ============================================================
+
         function openEditModal() {
 
-            document
-                .getElementById('editBalanceBtn')
-                .click();
+            const manualInput =
+                document.getElementById(
+                    'manualBalanceInput'
+                );
 
+            manualInput.value = '';
+
+            currentBalanceDisplay.textContent =
+                formatAmount(currentBalance);
+
+            updateFixedBalanceDisplay(
+                fixedBalance
+            );
+
+            editBalanceModal
+                .classList
+                .add('active');
+
+            setTimeout(() => {
+                manualInput.focus();
+            }, 100);
         }
 
 
@@ -1540,37 +1493,26 @@
 
             let totalNakitGelir = 0;
 
-
             salesData.forEach(item => {
 
-                if (
-                    item.odeme === 'Nakit'
-                ) {
+                if (item.odeme === 'Nakit') {
 
                     totalNakitGelir +=
-                        parseFloat(item.tutar) ||
-                        0;
-
+                        parseFloat(item.tutar) || 0;
                 }
-
             });
 
 
             let totalGider = 0;
 
-
             expenseData.forEach(item => {
 
                 totalGider +=
-                    parseFloat(item.tutar) ||
-                    0;
-
+                    parseFloat(item.tutar) || 0;
             });
 
 
-            return totalNakitGelir -
-                   totalGider;
-
+            return totalNakitGelir - totalGider;
         }
 
 
@@ -1579,36 +1521,30 @@
             fixedBalance =
                 calculateFixedBalance();
 
-
             updateFixedBalanceDisplay(
                 fixedBalance
             );
 
-
             fixedBalanceRef.set({
 
-                balance:
-                    fixedBalance,
+                balance: fixedBalance,
 
                 updatedAt:
                     firebase.database
                         .ServerValue
                         .TIMESTAMP
-
             });
-
         }
 
 
         // ============================================================
-        // BAKİYE DÜZENLEME
+        // BAKİYE KAYDETME
         // ============================================================
 
         const editBalanceModal =
             document.getElementById(
                 'editBalanceModal'
             );
-
 
         const manualBalanceInput =
             document.getElementById(
@@ -1617,63 +1553,7 @@
 
 
         document
-            .getElementById(
-                'editBalanceBtn'
-            )
-            .addEventListener(
-                'click',
-                function() {
-
-                    manualBalanceInput.value =
-                        '';
-
-
-                    currentBalanceDisplay.textContent =
-                        formatAmount(
-                            currentBalance
-                        );
-
-
-                    updateFixedBalanceDisplay(
-                        fixedBalance
-                    );
-
-
-                    editBalanceModal
-                        .classList
-                        .add('active');
-
-
-                    setTimeout(
-                        () =>
-                            manualBalanceInput.focus(),
-                        100
-                    );
-
-                }
-            );
-
-
-        document
-            .getElementById(
-                'cancelManualBalance'
-            )
-            .addEventListener(
-                'click',
-                function() {
-
-                    editBalanceModal
-                        .classList
-                        .remove('active');
-
-                }
-            );
-
-
-        document
-            .getElementById(
-                'saveManualBalance'
-            )
+            .getElementById('saveManualBalance')
             .addEventListener(
                 'click',
                 function() {
@@ -1694,18 +1574,14 @@
                         );
 
                         return;
-
                     }
 
 
-                    currentBalance =
-                        val;
-
+                    currentBalance = val;
 
                     updateBalanceDisplay(
-                        val
+                        currentBalance
                     );
-
 
                     editBalanceModal
                         .classList
@@ -1714,24 +1590,34 @@
 
                     balanceRef.set({
 
-                        balance:
-                            val,
+                        balance: currentBalance,
 
                         updatedAt:
                             firebase.database
                                 .ServerValue
                                 .TIMESTAMP
-
                     });
 
 
                     setSyncStatus(
                         '✅ Bakiye ' +
-                        formatAmount(val) +
+                        formatAmount(currentBalance) +
                         ' ₺ olarak ayarlandı',
                         'success'
                     );
+                }
+            );
 
+
+        document
+            .getElementById('cancelManualBalance')
+            .addEventListener(
+                'click',
+                function() {
+
+                    editBalanceModal
+                        .classList
+                        .remove('active');
                 }
             );
 
@@ -1741,15 +1627,11 @@
                 'click',
                 function(e) {
 
-                    if (
-                        e.target === this
-                    ) {
+                    if (e.target === this) {
 
                         this.classList
                             .remove('active');
-
                     }
-
                 }
             );
 
@@ -1759,141 +1641,105 @@
         // ============================================================
 
         const salesBody =
-            document.getElementById(
-                'salesBody'
-            );
-
+            document.getElementById('salesBody');
 
         const salesSearch =
-            document.getElementById(
-                'salesSearch'
-            );
-
+            document.getElementById('salesSearch');
 
         const salesRowCount =
-            document.getElementById(
-                'salesRowCount'
-            );
-
+            document.getElementById('salesRowCount');
 
         let salesData = [];
 
 
         function renderSales() {
 
-            salesBody.innerHTML =
-                '';
+            salesBody.innerHTML = '';
 
 
-            if (
-                salesData.length === 0
-            ) {
+            if (salesData.length === 0) {
 
                 salesBody.innerHTML =
                     '<tr><td colspan="8" class="text-center text-muted">Henüz gelir kaydı yok</td></tr>';
 
-
                 salesRowCount.textContent =
                     '0 satır';
 
-
                 return;
-
             }
 
 
-            salesData.forEach(
-                (item, index) => {
+            salesData.forEach((item, index) => {
 
-                    const tr =
-                        document.createElement(
-                            'tr'
-                        );
+                const tr =
+                    document.createElement('tr');
 
 
-                    const payBadge =
-                        item.odeme ===
-                        'Havale'
-                            ? 'havale'
-                            : 'nakit';
+                const payBadge =
+                    item.odeme === 'Havale'
+                        ? 'havale'
+                        : 'nakit';
 
 
-                    const havaleText =
-                        item.odeme ===
-                        'Havale'
-                            ? (
-                                item.havaleAlan ||
-                                '—'
-                            )
-                            : '—';
+                const havaleText =
+                    item.odeme === 'Havale'
+                        ? (item.havaleAlan || '—')
+                        : '—';
 
 
-                    tr.innerHTML = `
+                tr.innerHTML = `
+                    <td>${index + 1}</td>
 
-                        <td>
-                            ${index + 1}
-                        </td>
+                    <td>
+                        ${escapeHtml(
+                            item.musteri ||
+                            '(isimsiz)'
+                        )}
+                    </td>
 
-                        <td>
+                    <td>
+                        <span class="product-badge">
                             ${escapeHtml(
-                                item.musteri ||
-                                '(isimsiz)'
+                                item.urun ||
+                                '(ürün yok)'
                             )}
-                        </td>
+                        </span>
+                    </td>
 
-                        <td>
-                            <span class="product-badge">
-                                ${escapeHtml(
-                                    item.urun ||
-                                    '(ürün yok)'
-                                )}
-                            </span>
-                        </td>
+                    <td>
+                        <span class="type-badge ${payBadge}">
+                            ${item.odeme}
+                        </span>
+                    </td>
 
-                        <td>
-                            <span class="type-badge ${payBadge}">
-                                ${item.odeme}
-                            </span>
-                        </td>
+                    <td>
+                        ${escapeHtml(havaleText)}
+                    </td>
 
-                        <td>
-                            ${escapeHtml(
-                                havaleText
-                            )}
-                        </td>
+                    <td>
+                        ${formatAmount(item.tutar)}
+                    </td>
 
-                        <td>
-                            ${formatAmount(
-                                item.tutar
-                            )}
-                        </td>
+                    <td>
+                        ${escapeHtml(
+                            item.tarih || ''
+                        )}
+                    </td>
 
-                        <td>
-                            ${escapeHtml(
-                                item.tarih || ''
-                            )}
-                        </td>
+                    <td>
+                        <button
+                            class="btn btn-sm btn-outline-danger remove-sales-btn"
+                            data-id="${item.id}">
 
-                        <td>
+                            <i class="fas fa-times"></i>
 
-                            <button
-                                class="btn btn-sm btn-outline-danger remove-sales-btn"
-                                data-id="${item.id}">
-
-                                <i class="fas fa-times"></i>
-
-                            </button>
-
-                        </td>
-
-                    `;
+                        </button>
+                    </td>
+                `;
 
 
-                    salesBody
-                        .appendChild(tr);
-
-                }
-            );
+                salesBody.appendChild(tr);
+            });
 
 
             salesBody
@@ -1919,78 +1765,62 @@
                                 salesRef
                                     .child(id)
                                     .remove();
-
                             }
-
                         }
                     );
-
                 });
 
 
             salesRowCount.textContent =
-                salesData.length +
-                ' satır';
-
+                salesData.length + ' satır';
         }
 
 
-        salesRef.on(
-            'value',
-            (snapshot) => {
+        salesRef.on('value', (snapshot) => {
 
-                const data =
-                    snapshot.val();
+            const data =
+                snapshot.val();
 
-
-                salesData = [];
+            salesData = [];
 
 
-                if (data) {
+            if (data) {
 
-                    Object.keys(data)
-                        .forEach(key => {
+                Object.keys(data).forEach(key => {
 
-                            salesData.push({
-                                id: key,
-                                ...data[key]
-                            });
+                    salesData.push({
+                        id: key,
+                        ...data[key]
+                    });
 
-                        });
-
-
-                    salesData.sort(
-                        (a, b) =>
-                            (b.tarih || '')
-                                .localeCompare(
-                                    a.tarih || ''
-                                )
-                    );
-
-                }
+                });
 
 
-                renderSales();
-
-
-                updateFixedBalance();
-
-
-                setSyncStatus(
-                    '✅ ' +
-                    salesData.length +
-                    ' gelir',
-                    'success'
+                salesData.sort(
+                    (a, b) =>
+                        (b.tarih || '')
+                            .localeCompare(
+                                a.tarih || ''
+                            )
                 );
-
             }
-        );
+
+
+            renderSales();
+
+            updateFixedBalance();
+
+            setSyncStatus(
+                '✅ ' +
+                salesData.length +
+                ' gelir',
+                'success'
+            );
+        });
 
 
         document
-            .getElementById(
-                'addSalesBtn'
-            )
+            .getElementById('addSalesBtn')
             .addEventListener(
                 'click',
                 function() {
@@ -2066,116 +1896,101 @@
                         );
 
                         return;
-
                     }
 
 
-                    salesRef
-                        .push({
+                    salesRef.push({
 
-                            musteri,
-                            urun,
-                            odeme,
-                            tarih,
-                            havaleAlan,
-                            tutar,
+                        musteri,
+                        urun,
+                        odeme,
+                        tarih,
+                        havaleAlan,
+                        tutar,
 
-                            createdAt:
-                                firebase.database
-                                    .ServerValue
-                                    .TIMESTAMP
+                        createdAt:
+                            firebase.database
+                                .ServerValue
+                                .TIMESTAMP
 
-                        })
-                        .then(() => {
+                    }).then(() => {
 
-                            setSyncStatus(
-                                '✅ Gelir eklendi',
-                                'success'
+                        setSyncStatus(
+                            '✅ Gelir eklendi',
+                            'success'
+                        );
+
+
+                        document
+                            .getElementById(
+                                'salesCustomer'
+                            )
+                            .value = '';
+
+
+                        document
+                            .getElementById(
+                                'salesProduct'
+                            )
+                            .value = '';
+
+
+                        document
+                            .getElementById(
+                                'salesAmount'
+                            )
+                            .value = '';
+
+
+                        if (
+                            odeme === 'Havale'
+                        ) {
+
+                            document
+                                .getElementById(
+                                    'salesHavaleNote'
+                                )
+                                .value = '';
+                        }
+
+
+                        document
+                            .getElementById(
+                                'salesDate'
+                            )
+                            .value =
+                            getToday();
+
+
+                        if (
+                            odeme === 'Nakit'
+                        ) {
+
+                            currentBalance +=
+                                tutar;
+
+                            updateBalanceDisplay(
+                                currentBalance
                             );
 
+                            balanceRef.set({
 
-                            document
-                                .getElementById(
-                                    'salesCustomer'
-                                )
-                                .value = '';
+                                balance:
+                                    currentBalance,
 
-
-                            document
-                                .getElementById(
-                                    'salesProduct'
-                                )
-                                .value = '';
-
-
-                            document
-                                .getElementById(
-                                    'salesAmount'
-                                )
-                                .value = '';
-
-
-                            if (
-                                odeme ===
-                                'Havale'
-                            ) {
-
-                                document
-                                    .getElementById(
-                                        'salesHavaleNote'
-                                    )
-                                    .value =
-                                    '';
-
-                            }
-
-
-                            document
-                                .getElementById(
-                                    'salesDate'
-                                )
-                                .value =
-                                getToday();
-
-
-                            if (
-                                odeme ===
-                                'Nakit'
-                            ) {
-
-                                currentBalance +=
-                                    tutar;
-
-
-                                updateBalanceDisplay(
-                                    currentBalance
-                                );
-
-
-                                balanceRef.set({
-
-                                    balance:
-                                        currentBalance,
-
-                                    updatedAt:
-                                        firebase.database
-                                            .ServerValue
-                                            .TIMESTAMP
-
-                                });
-
-                            }
-
-                        });
-
+                                updatedAt:
+                                    firebase.database
+                                        .ServerValue
+                                        .TIMESTAMP
+                            });
+                        }
+                    });
                 }
             );
 
 
         document
-            .getElementById(
-                'clearSalesBtn'
-            )
+            .getElementById('clearSalesBtn')
             .addEventListener(
                 'click',
                 function() {
@@ -2193,9 +2008,7 @@
                     ) {
 
                         salesRef.remove();
-
                     }
-
                 }
             );
 
@@ -2217,9 +2030,7 @@
 
 
                 salesRowCount.textContent =
-                    visible +
-                    ' satır';
-
+                    visible + ' satır';
             }
         );
 
@@ -2233,26 +2044,22 @@
                 'expenseBody'
             );
 
-
         const expenseSearch =
             document.getElementById(
                 'expenseSearch'
             );
-
 
         const expenseRowCount =
             document.getElementById(
                 'expenseRowCount'
             );
 
-
         let expenseData = [];
 
 
         function renderExpenses() {
 
-            expenseBody.innerHTML =
-                '';
+            expenseBody.innerHTML = '';
 
 
             if (
@@ -2262,13 +2069,10 @@
                 expenseBody.innerHTML =
                     '<tr><td colspan="8" class="text-center text-muted">Henüz gider kaydı yok</td></tr>';
 
-
                 expenseRowCount.textContent =
                     '0 satır';
 
-
                 return;
-
             }
 
 
@@ -2283,9 +2087,7 @@
 
                     tr.innerHTML = `
 
-                        <td>
-                            ${index + 1}
-                        </td>
+                        <td>${index + 1}</td>
 
                         <td>
                             ${escapeHtml(
@@ -2322,8 +2124,7 @@
 
                         <td>
                             ${escapeHtml(
-                                item.not ||
-                                '—'
+                                item.not || '—'
                             )}
                         </td>
 
@@ -2342,9 +2143,7 @@
                     `;
 
 
-                    expenseBody
-                        .appendChild(tr);
-
+                    expenseBody.appendChild(tr);
                 }
             );
 
@@ -2372,70 +2171,56 @@
                                 expenseRef
                                     .child(id)
                                     .remove();
-
                             }
-
                         }
                     );
-
                 });
 
 
             expenseRowCount.textContent =
                 expenseData.length +
                 ' satır';
-
         }
 
 
-        expenseRef.on(
-            'value',
-            (snapshot) => {
+        expenseRef.on('value', (snapshot) => {
 
-                const data =
-                    snapshot.val();
+            const data =
+                snapshot.val();
 
-
-                expenseData = [];
+            expenseData = [];
 
 
-                if (data) {
+            if (data) {
 
-                    Object.keys(data)
-                        .forEach(key => {
+                Object.keys(data).forEach(key => {
 
-                            expenseData.push({
-                                id: key,
-                                ...data[key]
-                            });
+                    expenseData.push({
+                        id: key,
+                        ...data[key]
+                    });
 
-                        });
-
-
-                    expenseData.sort(
-                        (a, b) =>
-                            (b.tarih || '')
-                                .localeCompare(
-                                    a.tarih || ''
-                                )
-                    );
-
-                }
+                });
 
 
-                renderExpenses();
-
-
-                updateFixedBalance();
-
+                expenseData.sort(
+                    (a, b) =>
+                        (b.tarih || '')
+                            .localeCompare(
+                                a.tarih || ''
+                            )
+                );
             }
-        );
+
+
+            renderExpenses();
+
+            updateFixedBalance();
+        });
 
 
         document
-            .getElementById(
-                'addExpenseBtn'
-            )
+            .getElementById('addExpenseBtn')
             .addEventListener(
                 'click',
                 function() {
@@ -2507,101 +2292,93 @@
                         );
 
                         return;
-
                     }
 
 
-                    expenseRef
-                        .push({
+                    expenseRef.push({
 
-                            kategori,
-                            urun,
-                            alici,
-                            tarih,
-                            not,
-                            tutar,
+                        kategori,
+                        urun,
+                        alici,
+                        tarih,
+                        not,
+                        tutar,
 
-                            createdAt:
+                        createdAt:
+                            firebase.database
+                                .ServerValue
+                                .TIMESTAMP
+
+                    }).then(() => {
+
+                        setSyncStatus(
+                            '✅ Gider eklendi',
+                            'success'
+                        );
+
+
+                        document
+                            .getElementById(
+                                'expenseProduct'
+                            )
+                            .value = '';
+
+
+                        document
+                            .getElementById(
+                                'expenseReceiver'
+                            )
+                            .value = '';
+
+
+                        document
+                            .getElementById(
+                                'expenseAmount'
+                            )
+                            .value = '';
+
+
+                        document
+                            .getElementById(
+                                'expenseNote'
+                            )
+                            .value = '';
+
+
+                        document
+                            .getElementById(
+                                'expenseDate'
+                            )
+                            .value =
+                            getToday();
+
+
+                        currentBalance -=
+                            tutar;
+
+
+                        updateBalanceDisplay(
+                            currentBalance
+                        );
+
+
+                        balanceRef.set({
+
+                            balance:
+                                currentBalance,
+
+                            updatedAt:
                                 firebase.database
                                     .ServerValue
                                     .TIMESTAMP
-
-                        })
-                        .then(() => {
-
-                            setSyncStatus(
-                                '✅ Gider eklendi',
-                                'success'
-                            );
-
-
-                            document
-                                .getElementById(
-                                    'expenseProduct'
-                                )
-                                .value = '';
-
-
-                            document
-                                .getElementById(
-                                    'expenseReceiver'
-                                )
-                                .value = '';
-
-
-                            document
-                                .getElementById(
-                                    'expenseAmount'
-                                )
-                                .value = '';
-
-
-                            document
-                                .getElementById(
-                                    'expenseNote'
-                                )
-                                .value = '';
-
-
-                            document
-                                .getElementById(
-                                    'expenseDate'
-                                )
-                                .value =
-                                getToday();
-
-
-                            currentBalance -=
-                                tutar;
-
-
-                            updateBalanceDisplay(
-                                currentBalance
-                            );
-
-
-                            balanceRef.set({
-
-                                balance:
-                                    currentBalance,
-
-                                updatedAt:
-                                    firebase.database
-                                        .ServerValue
-                                        .TIMESTAMP
-
-                            });
-
                         });
-
+                    });
                 }
             );
 
 
         document
-            .getElementById(
-                'clearExpenseBtn'
-            )
+            .getElementById('clearExpenseBtn')
             .addEventListener(
                 'click',
                 function() {
@@ -2619,9 +2396,7 @@
                     ) {
 
                         expenseRef.remove();
-
                     }
-
                 }
             );
 
@@ -2643,9 +2418,7 @@
 
 
                 expenseRowCount.textContent =
-                    visible +
-                    ' satır';
-
+                    visible + ' satır';
             }
         );
 
@@ -2664,19 +2437,15 @@
                     'recipientList'
                 );
 
-
             const tagsContainer =
                 document.getElementById(
                     'recipientTagsContainer'
                 );
 
 
-            container.innerHTML =
-                '';
+            container.innerHTML = '';
 
-
-            tagsContainer.innerHTML =
-                '';
+            tagsContainer.innerHTML = '';
 
 
             if (
@@ -2686,13 +2455,10 @@
                 container.innerHTML =
                     '<span class="text-muted small">Henüz kişi eklenmemiş.</span>';
 
-
                 tagsContainer.innerHTML =
                     '<span class="text-muted small">Listeden kişi ekleyin.</span>';
 
-
                 return;
-
             }
 
 
@@ -2734,7 +2500,6 @@
                         ✕
 
                     </span>
-
                 `;
 
 
@@ -2776,14 +2541,11 @@
 
 
                         toggleSalesHavale();
-
                     }
                 );
 
 
-                tagsContainer
-                    .appendChild(tag);
-
+                tagsContainer.appendChild(tag);
             });
 
 
@@ -2810,14 +2572,10 @@
                                 recipientsRef
                                     .child(id)
                                     .remove();
-
                             }
-
                         }
                     );
-
                 });
-
         }
 
 
@@ -2841,14 +2599,11 @@
                                 id: key,
                                 ...data[key]
                             });
-
                         });
-
                 }
 
 
                 renderRecipients();
-
             }
         );
 
@@ -2886,7 +2641,6 @@
                         );
 
                         return;
-
                     }
 
 
@@ -2907,19 +2661,15 @@
                                 .getElementById(
                                     'newRecipientName'
                                 )
-                                .value =
-                                '';
+                                .value = '';
 
 
                             document
                                 .getElementById(
                                     'newRecipientNote'
                                 )
-                                .value =
-                                '';
-
+                                .value = '';
                         });
-
                 }
             );
 
@@ -2945,12 +2695,9 @@
                 );
 
 
-            container.innerHTML =
-                '';
+            container.innerHTML = '';
 
-
-            tagsContainer.innerHTML =
-                '';
+            tagsContainer.innerHTML = '';
 
 
             if (
@@ -2960,13 +2707,10 @@
                 container.innerHTML =
                     '<span class="text-muted small">Henüz gider kalemi eklenmemiş.</span>';
 
-
                 tagsContainer.innerHTML =
                     '<span class="text-muted small">Listeden gider kalemi ekleyin.</span>';
 
-
                 return;
-
             }
 
 
@@ -2989,7 +2733,6 @@
                     </strong>
 
                     ${escapeHtml(e.urun)}
-
                     (${formatAmount(e.tutar)}₺)
 
                     ${
@@ -3013,7 +2756,6 @@
                         ✕
 
                     </span>
-
                 `;
 
 
@@ -3067,8 +2809,7 @@
                                 'expenseReceiver'
                             )
                             .value =
-                            e.alici ||
-                            '';
+                            e.alici || '';
 
 
                         document
@@ -3076,16 +2817,12 @@
                                 'expenseNote'
                             )
                             .value =
-                            e.not ||
-                            '';
-
+                            e.not || '';
                     }
                 );
 
 
-                tagsContainer
-                    .appendChild(tag);
-
+                tagsContainer.appendChild(tag);
             });
 
 
@@ -3112,14 +2849,10 @@
                                 expenseTemplatesRef
                                     .child(id)
                                     .remove();
-
                             }
-
                         }
                     );
-
                 });
-
         }
 
 
@@ -3143,14 +2876,11 @@
                                 id: key,
                                 ...data[key]
                             });
-
                         });
-
                 }
 
 
                 renderExpenseTemplates();
-
             }
         );
 
@@ -3221,7 +2951,6 @@
                         );
 
                         return;
-
                     }
 
 
@@ -3245,43 +2974,36 @@
                                 .getElementById(
                                     'newExpenseCategory'
                                 )
-                                .value =
-                                '';
+                                .value = '';
 
 
                             document
                                 .getElementById(
                                     'newExpenseProduct'
                                 )
-                                .value =
-                                '';
+                                .value = '';
 
 
                             document
                                 .getElementById(
                                     'newExpenseAmount'
                                 )
-                                .value =
-                                '';
+                                .value = '';
 
 
                             document
                                 .getElementById(
                                     'newExpenseReceiver'
                                 )
-                                .value =
-                                '';
+                                .value = '';
 
 
                             document
                                 .getElementById(
                                     'newExpenseNote'
                                 )
-                                .value =
-                                '';
-
+                                .value = '';
                         });
-
                 }
             );
 
@@ -3297,27 +3019,11 @@
 
 
             return unsafe
-                .replace(
-                    /&/g,
-                    "&amp;"
-                )
-                .replace(
-                    /</g,
-                    "&lt;"
-                )
-                .replace(
-                    />/g,
-                    "&gt;"
-                )
-                .replace(
-                    /"/g,
-                    "&quot;"
-                )
-                .replace(
-                    /'/g,
-                    "&#039;"
-                );
-
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
         }
 
 
@@ -3326,7 +3032,6 @@
             return new Date()
                 .toISOString()
                 .split('T')[0];
-
         }
 
 
@@ -3374,9 +3079,7 @@
                         match = true;
 
                         break;
-
                     }
-
                 }
 
 
@@ -3385,9 +3088,7 @@
                     query === ''
                         ? ''
                         : 'none';
-
             });
-
         }
 
 
@@ -3402,8 +3103,7 @@
                 );
 
 
-            el.innerHTML =
-                text;
+            el.innerHTML = text;
 
 
             el.className =
@@ -3418,9 +3118,7 @@
                     'syncing'
                 );
 
-            }
-
-            else if (
+            } else if (
                 type === 'error'
             ) {
 
@@ -3428,16 +3126,12 @@
                     'error'
                 );
 
-            }
-
-            else {
+            } else {
 
                 el.classList.add(
                     'sync-status'
                 );
-
             }
-
         }
 
 
@@ -3467,27 +3161,20 @@
                 salesHavaleNote.disabled =
                     false;
 
-
                 salesHavaleNote.placeholder =
                     'Havale alacak kişi bilgisi';
 
-            }
-
-            else {
+            } else {
 
                 salesHavaleNote.disabled =
                     true;
 
-
                 salesHavaleNote.value =
                     '';
 
-
                 salesHavaleNote.placeholder =
                     'Havale seçili değil';
-
             }
-
         }
 
 
@@ -3539,7 +3226,6 @@
                             'Tutar (₺)',
                             'Tarih'
                         ]
-
                     ];
 
 
@@ -3557,38 +3243,16 @@
 
                             salesDataExcel.push([
 
-                                cols[0]
-                                    .textContent
-                                    .trim(),
-
-                                cols[1]
-                                    .textContent
-                                    .trim(),
-
-                                cols[2]
-                                    .textContent
-                                    .trim(),
-
-                                cols[3]
-                                    .textContent
-                                    .trim(),
-
-                                cols[4]
-                                    .textContent
-                                    .trim(),
-
-                                cols[5]
-                                    .textContent
-                                    .trim(),
-
-                                cols[6]
-                                    .textContent
-                                    .trim()
+                                cols[0].textContent.trim(),
+                                cols[1].textContent.trim(),
+                                cols[2].textContent.trim(),
+                                cols[3].textContent.trim(),
+                                cols[4].textContent.trim(),
+                                cols[5].textContent.trim(),
+                                cols[6].textContent.trim()
 
                             ]);
-
                         }
-
                     });
 
 
@@ -3616,7 +3280,6 @@
                             'Tarih',
                             'Not'
                         ]
-
                     ];
 
 
@@ -3634,38 +3297,16 @@
 
                             expenseDataExcel.push([
 
-                                cols[0]
-                                    .textContent
-                                    .trim(),
-
-                                cols[1]
-                                    .textContent
-                                    .trim(),
-
-                                cols[2]
-                                    .textContent
-                                    .trim(),
-
-                                cols[3]
-                                    .textContent
-                                    .trim(),
-
-                                cols[4]
-                                    .textContent
-                                    .trim(),
-
-                                cols[5]
-                                    .textContent
-                                    .trim(),
-
-                                cols[6]
-                                    .textContent
-                                    .trim()
+                                cols[0].textContent.trim(),
+                                cols[1].textContent.trim(),
+                                cols[2].textContent.trim(),
+                                cols[3].textContent.trim(),
+                                cols[4].textContent.trim(),
+                                cols[5].textContent.trim(),
+                                cols[6].textContent.trim()
 
                             ]);
-
                         }
-
                     });
 
 
@@ -3701,7 +3342,6 @@
                                 fixedBalance
                             )
                         ]
-
                     ];
 
 
@@ -3728,7 +3368,6 @@
                         '✅ Excel indirildi',
                         'success'
                     );
-
                 }
             );
 
@@ -3764,16 +3403,13 @@
                 if (data) {
 
                     currentBalance =
-                        data.balance ||
-                        0;
+                        data.balance || 0;
 
 
                     updateBalanceDisplay(
                         currentBalance
                     );
-
                 }
-
             }
         );
 
@@ -3789,25 +3425,20 @@
                 if (data) {
 
                     fixedBalance =
-                        data.balance ||
-                        0;
+                        data.balance || 0;
 
 
                     updateFixedBalanceDisplay(
                         fixedBalance
                     );
-
                 }
-
             }
         );
 
 
         updateBalanceDisplay(0);
 
-
         updateFixedBalanceDisplay(0);
-
 
         setSyncStatus(
             '🔄 Yükleniyor...',
@@ -3817,11 +3448,6 @@
 
         console.log(
             '✅ Kasa Yönetimi başlatıldı!'
-        );
-
-
-        console.log(
-            '📌 Bakiye sol üstte büyük sayaç olarak gösteriliyor.'
         );
 
     </script>
